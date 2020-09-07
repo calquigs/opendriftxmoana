@@ -12,23 +12,24 @@ tranmx = np.array([[.6, .2, .1, 0],
 
 tranmx = tranmx.T
 
-generation = 0
-multigendispersal = np.empty(4)
-multigendispersal_dilluted = np.empty(4)
+generation = 1 #first column of the matrix = first gen dispersal
+mulgendis = tranmx[:,0]
+mulgendisdil = tranmx[:,0]
+genvector = tranmx[:,0] 
 
-while generation <= 14:
-	genvector= (np.linalg.matrix_power(tranmx, generation)).dot(tranmx[:,0])
-	multigendispersal = np.add(multigendispersal, genvector)
-
-	genvector_dilluted = np.divide(genvector, 2**generation)
-	multigendispersal_dilluted = np.add(multigendispersal_dilluted, genvector_dilluted)
-
+while generation < 14:
+	#calculate where mussels from column 1 will be in the next generation
+	genvector = genvector.dot(tranmx) 
+	#add next generation to total multigenerational dispersal
+	mulgendis = mulgendis + genvector 
+	#dillute the amount of genes by number of generations(your grandkids have less of your genetic material than your kids)
+	mulgendisdil = mulgendisdil + genvector/2**generation 
 	generation += 1
 
-multigendispersalP = np.divide(multigendispersal, sum(multigendispersal))
+mulgendisP = mulgendis/sum(mulgendis)
 multigendispersal_dillutedP = np.divide(multigendispersal_dilluted, sum(multigendispersal_dilluted))
 
-print("Dispersal total: ", multigendispersal)
-print("Dispersal proportions: ", multigendispersalP)
-print("Dilluted dispersal: ", multigendispersal_dilluted)
-print("Dilluted dispersal proportions: ", multigendispersal_dillutedP)
+print("Dispersal total: ", mulgendis)
+print("Dispersal proportions: ", mulgendisP)
+print("Dilluted dispersal: ", mulgendisdil)
+print("Dilluted dispersal proportions: ", multigendisdilP)
