@@ -22,7 +22,7 @@ while generation < 14:
 	genvector = genvector.dot(tranmx) 
 	#add next generation to total multigenerational dispersal
 	mulgendis = mulgendis + genvector 
-	#dillute the amount of genes by number of generations(your grandkids have less of your genetic material than your kids)
+	#dillute the amount of genes by number of generations(your grandkids have less of your DNA than your kids)
 	mulgendisdil = mulgendisdil + genvector/2**generation 
 	generation += 1
 
@@ -32,4 +32,4 @@ mulgendisdilP = mulgendisdil/sum(mulgendisdil)
 print("Dispersal total: ", mulgendis)
 print("Dispersal proportions: ", mulgendisP)
 print("Dilluted dispersal: ", mulgendisdil)
-print("Dilluted dispersal proportions: ", mulgendisdilP)
+print("Dilluted dispersal proportions: ", mulgendisdilP) #this is the most meaningful output 
