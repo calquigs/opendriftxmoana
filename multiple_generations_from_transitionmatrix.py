@@ -27,9 +27,9 @@ while generation < 14:
 	generation += 1
 
 mulgendisP = mulgendis/sum(mulgendis)
-multigendispersal_dillutedP = np.divide(multigendispersal_dilluted, sum(multigendispersal_dilluted))
+mulgendisdilP = mulgendisdil/sum(mulgendisdil)
 
 print("Dispersal total: ", mulgendis)
 print("Dispersal proportions: ", mulgendisP)
 print("Dilluted dispersal: ", mulgendisdil)
-print("Dilluted dispersal proportions: ", multigendisdilP)
+print("Dilluted dispersal proportions: ", mulgendisdilP)
