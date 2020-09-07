@@ -5,11 +5,12 @@ import os
 import sys
 import numpy as np
 
+#read in transition matrix, source populations in rows
 tranmx = np.array([[.6, .2, .1, 0], 
 					[.2, .5, .1, .1], 
 					[.1, .1, .5, .2], 
  					[0, .1, .2, .6]])
-
+#flip it just because, tbh idk why
 tranmx = tranmx.T
 
 generation = 1 #first column of the matrix = first gen dispersal
