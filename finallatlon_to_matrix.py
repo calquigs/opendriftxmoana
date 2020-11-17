@@ -2,6 +2,7 @@
 
 import os
 import sys
+import re
 import numpy as np
 import scipy as scipy
 #from numpy import savetxt
@@ -19,59 +20,34 @@ latsrange = [-47.5, -34]
 bins = [331, 300]
 nzrange = [lonsrange, latsrange]
 
-startlon = []
-startlat = []
-#only pull start lat lon once
-getstartlatlon = True
 
-os.chdir("C:/Users/quigleca/Desktop/moana_outputs/processed")
+f = open("C:/Users/quigleca/Desktop/opendrift_scripts/practicefile.txt", "r")
 
-for file in os.listdir("C:/Users/quigleca/Desktop/moana_outputs/processed"):
-	f = open(file, "r")
+#get start/final lats/lons from file
+starttofinish = ""
+filelen = 0
+for line in f:
+	line = re.sub("\n", "\t", line)
+	starttofinish += line
+	filelen += 1
 
-	#is the first line the source cell?
-	firstlinestart = True
+starttofinish = starttofinish.split("\t")
+starttofinish = np.asarray(starttofinish)
+starttofinish = np.reshape(starttofinish, (filelen, 4))
+starttofinish = starttofinish.astype(float)
 
-	#get lats/lons from file
-	entrylons = []
-	entrylats = []
-	for line in f:
-		if firstlinestart:
-			elems = line.split()
-			if getstartlatlon:
-				startlon.append(float(elems[0]))
-				startlat.append(float(elems[1]))
-				getstartlatlon = False
-			firstlinestart = False
-
-		elems = line.split()
-		entrylon = float(elems[0])
-		entrylat = float(elems[1])
-		#convert negative lons to positve
-		if entrylon < 0:
-			entrylon += 360
-		entrylons.append(entrylon)
-		entrylats.append(entrylat)
-	#get number of particles
-	particlecount = len(entrylons)
-	#remove NaN
-	entrylons = [x for x in entrylons if str(x) != "nan"]
-	entrylats = [x for x in entrylats if str(x) != "nan"]
-
-	#bins = 311
-	#nzrange = [[164.2506,183.7039], [-47.2785,-33.9572]]
-
-	binnies = scipy.stats.binned_statistic_2d(
-		entrylons, entrylats, entrylons, 
-		statistic = "count", 
-		bins = bins, 
-		range = nzrange
-		)
+binnies = scipy.stats.binned_statistic_2d(
+	starttofinish[:,2], starttofinish[:,3], starttofinish[:,2], 
+	statistic = "count", 
+	bins = bins, 
+	range = nzrange
+	)
 	
-	#get percent settlers from total
-	binniesstat = (binnies.statistic)/particlecount
-		
-	onesourcemat = np.dstack((onesourcemat, binniesstat))
+#get percent settlers from total
+binniesstat = (binnies.statistic)/filelen
+print(binnies.statistic)
+print("wtf")
+onesourcemat = np.dstack((onesourcemat, binniesstat))
 
 meanmat = np.mean(onesourcemat, 2)
 
@@ -87,52 +63,13 @@ startbin = scipy.stats.binned_statistic_2d(
 	bins = bins,
 	range = nzrange)
 
+#exclude binedges
 startbinnumber = 0
 startbinnumber = (startbin.binnumber - 2*(startbinnumber // (bins[1]+2)) - bins[1]-1)
 startbinnumber = startbinnumber[0]
 
 bigmomma[startbinnumber, ] = meanmat.flatten('F')
-print(len(meanmat.flatten("F")))
 sparse.save_npz("C:/Users/quigleca/Desktop/moana_outputs/bigmomma.npz", bigmomma)
 bigmommaback = sparse.load_npz("C:/Users/quigleca/Desktop/moana_outputs/bigmomma.npz")
-
+print(startbinnumber)
 print(bigmommaback[startbinnumber,34501])
-#Flatten 2d array of destinations to 1d (maybe trim edges?)
-#try binning with just one entry (startlat, startlon) to get binnumber to store in poroper column.
-
-#inputlon = float(input("Destination longitude? "))
-#if inputlon < 0:
-#	inputlon += 360
-#if inputlon >= 164.2506 and inputlon <= 183.7039:
-#	pass
-#else:
-#	print("Longitude out of range")
-#	sys.exit()
-#
-#inputlat = float(input("Destination latitude? "))
-#if inputlat >= -47.2785 and inputlat <= -33.9572:
-#	pass
-#else:
-#	print("Latitude out of range")
-#	sys.exit()
-#
-#print("nice, thanks")
-#
-#
-#inlonbin = np.digitize(inputlon, binnies.x_edge)
-#print(inlonbin)
-#inlatbin = np.digitize(inputlat, binnies.y_edge)
-#print(inlatbin)
-#
-#print(meanmat[inlonbin, inlatbin])
-#print(meanmat[inlonbin][inlatbin])
-#testlons = [164.2506,183.7039]
-#testlats = [-47.2785,-33.9572]
-
-#testbins = scipy.stats.binned_statistic_2d(
-#		testlons, testlats, testlons, 
-#		statistic = "count", 
-#		bins = bins, 
-#		range = nzrange,
-#		)
-#print(testbins.binnumber)
