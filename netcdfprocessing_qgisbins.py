@@ -18,14 +18,6 @@ lat = traj["lat"][:]
 status = traj["status"][:]
 time = traj["time"][:]
 
-#spawnstart = 7
-#spawnend = 11
-#starttime = getattr(traj, "time_coverage_start")
-#starttime = datetime.strptime(starttime, "%Y-%m-%d %H:%M:%S")
-#timestep = getattr(traj, "time_step_output")
-#timestep = datetime.strptime(timestep, "%H:%M:%S").time()
-
-
 #extract final timestep of each particle from status variable 
 finaltimes = []
 for part in status:
@@ -56,7 +48,7 @@ for final in finaltimes:
 	finallat.append(lat[count, final])
 	count += 1
 
-#clip to startlon/lat of complete trajectories (ideally they're all complete)
+#clip to startlon/lat of complete trajectories only (ideally they're all complete)
 startlon2 = []
 startlat2 = []
 count = 0
@@ -96,12 +88,30 @@ bins = shp.shapes()
 records = shp.records()
 
 #create empty connectivity matrix
+startbins = []
+finalbins = []
 conmat = np.empty((len(bins), len(bins)))
 
+#check if start/end points fall in bins.
 for i in range(len(startpoints)):
-	for nbin in bins:
+	for j in range(len(bins)):
 		if startpoints[i].within(shape(nbin)):
-			print("Point ", startpoints[i]," starts in bin ",records[i])
+			startbins.append((i,records[j][0]))
+		
+for i in range(len(finalpoints)):
+	for j in range(len(bins)):
+		if finalpoints[i].within(shape(nbin)):
+			startbins.append((i,records[j][0]))
+			
+#check if point started AND ended in a bin
+
+startbins2 = [i[1] for i in startbins if i[0] in finalbins[0,:]]
+finalbins2 = [i[1] for i in finalbins if i[0] in startbins[0,:]]
+
+startbins = startbins2
+finalbins = finalbins2
+		
+					 
 
 
 
