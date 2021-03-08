@@ -9,7 +9,7 @@ import math
 #from mpl_toolkits.basemap import Basemap
 
 #open + load  file
-fn = "/Users/calvinquigley/Desktop/14mussels_1day_output.nc"
+fn = "14mussels_1day_output.nc"
 traj = nc.Dataset(fn)
 
 #extract variables
@@ -19,10 +19,17 @@ status = traj["status"][:]
 time = traj["time"][:]
 
 #extract final timestep of each particle from status variable 
+print(len(status))
+#finaltimes = [ [i for i in range(len(part)) if part[i] > 0] for part in status ]
 finaltimes = []
 for part in status:
-	finaltime = [i for i in range(len(part)) if part[i] > 0]
-	finaltimes += finaltime
+  print(f"status has {len(part)} parts {part.__class__}")
+  finaltime = [i for i in range(len(part)) if part[i] > 0]
+  print(part)
+  finaltimes += finaltime
+  break
+print("done with finaltimes")
+sys.exit(1)
 
 #extract start lon, lat for each particle (first nonmasked value)
 startlon = []
