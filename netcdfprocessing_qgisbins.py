@@ -85,7 +85,7 @@ records = shp.records()
 # that corresponds to the grid cell (if any).
 
 class Grid:
-    def __init__(self, bins):
+    def __init__(self, bins, records):
         self.bins = bins
         min_lon = min([min([p[0] for p in b.points[:]]) for b in bins])
         max_lon = max([max([p[0] for p in b.points[:]]) for b in bins])
@@ -108,18 +108,25 @@ class Grid:
             lon_idx = self.lon_to_grid_col(min([p[0] for p in b.points[:]]))
             lat_idx = self.lat_to_grid_row(min([p[1] for p in b.points[:]]))
             self.bin_idx[lat_idx, lon_idx] = i
-
+        # assign region to each grid cell
+        self.bin_regions = np.full((self.nlat, self.nlon), -1, dtype='int')
+        for i in range(len(self.bins)):
+            b = self.bins[i]
+            lon_idx = self.lon_to_grid_col(min([p[0] for p in b.points[:]]))
+            lat_idx = self.lat_to_grid_row(min([p[1] for p in b.points[:]]))
+            self.bin_regions[lat_idx, lon_idx] = records[i][5]-1
     def lon_to_grid_col(self, lon):
         return math.floor(round((lon - self.min_lon) / self.lon_cell_size, 6))
-
     def lat_to_grid_row(self, lat):
         return math.floor(round((lat - self.min_lat) / self.lat_cell_size, 6))
-
     def get_bin_idx(self, lon, lat):
         lon_idx = self.lon_to_grid_col(lon)
         lat_idx = self.lat_to_grid_row(lat)
         return self.bin_idx[lat_idx, lon_idx]
-
+    def get_bin_region(self, lon, lat):
+        lon_idx = self.lon_to_grid_col(lon)
+        lat_idx = self.lat_to_grid_row(lat)
+        return self.bin_regions[lat_idx, lon_idx]
     def plot_with_query_point(self, query_point):
         for bidx in range(len(self.bins)):
             b = self.bins[bidx]
@@ -133,12 +140,11 @@ class Grid:
             #             y.append(self.min_lat + (row + 0.5) * self.lat_cell_size)
             plt.plot(x, y)
             # break
-
         plt.scatter(query_point.x, query_point.y, s=80, marker="*")
         plt.show()
 
 print('creating settlement-bin lookup grid...')
-grid = Grid(bins)
+grid = Grid(bins, records)
 
 print('checking if start/end points fall in bins')
 missed_bin_count = 0
@@ -151,7 +157,6 @@ for i in range(len(startpoints)):
         missed_bin_count += 1
         if missed_bin_count < 1000:
             continue  # ignore the first few, so we can look at them one-at-a-time
-
         print(f'point {i} did not start in a bin')
         min_dist = 1e9
         min_bin = None
@@ -183,16 +188,7 @@ for i in range(len(finalpoints)):
     start_bin_idx = grid.get_bin_idx(startpoints[i].x, startpoints[i].y)
     final_bin_idx = grid.get_bin_idx(finalpoints[i].x, finalpoints[i].y)
     startfinalbins.append([start_bin_idx, final_bin_idx])
-
-
-print('check if point started AND ended in a bin')
-# (MQ) it explodes here. Not sure what's supposed to happen...
-startbins2 = [i[1] for i in startbins if i[0] in finalbins[0][:]]
-finalbins2 = [i[1] for i in finalbins if i[0] in startbins[0][:]]
-
-startbins = startbins2
-finalbins = finalbins2
-        
+       
 #create empty connectivity matrix
 conmat = np.empty((len(bins), len(bins)+1))
 
@@ -240,22 +236,27 @@ for i in range(len(musmat[0,:])):
         musmattrim[:, count] = musmat[:,i]
         count += 1
 
-
-
 #create heatmap
 import seaborn as sns
 ax = sns.heatmap(musmattrim, mask = (musmattrim == 0))
 
 
+
 #create conmat based on regions
 regionconmat = np.zeros((11, 12))
 
-for i in startfinalbins:
-    if i[0] > 0:
+startfinalregions = []
+for i in range(len(finalpoints)):
+    start_bin_region = grid.get_bin_region(startpoints[i].x, startpoints[i].y)
+    final_bin_region = grid.get_bin_region(finalpoints[i].x, finalpoints[i].y)
+    startfinalregions.append([start_bin_region, final_bin_region])
+
+for i in startfinalregions:
+    if i[0] >= 0:
         if i[1] == -1:
-            regionconmat[records[i[0]][5], -1] += 1
+            regionconmat[i[0], -1] += 1
         else:
-            regionconmat[records[i[0]][5]][records[i[1]][5]] += 1
+            regionconmat[i[0], i[1]] += 1
 
 #convert to percent settlers
 regionconmatpercent = np.zeros((11, 12))
