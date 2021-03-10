@@ -10,7 +10,7 @@ import math
 from timeit import default_timer as timer
 
 print('parse input file')
-fn = "Desktop/14mussels_1day_output.nc"
+fn = os.path.expanduser("~/Desktop/14mussels_1day_output.nc")
 traj = nc.Dataset(fn)
 
 print('extract variables')
@@ -74,7 +74,8 @@ for i in finallon:
 
 print('get bins from shapefile')
 import shapefile
-shp = shapefile.Reader("Desktop/settlement_bins/settlement_bins.shp")
+shape_filename = os.path.expanduser("~/Desktop/settlement_bins/settlement_bins.shp")
+shp = shapefile.Reader(shape_filename)
 bins = shp.shapes()
 records = shp.records()
 
