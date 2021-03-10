@@ -4,7 +4,7 @@ import os
 import sys
 import numpy as np
 import netCDF4 as nc
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import math
 #from mpl_toolkits.basemap import Basemap
 from timeit import default_timer as timer
@@ -95,43 +95,86 @@ class Grid:
         print(f'lat range: ({min_lat}, {max_lat})')
         self.lon_cell_size = 0.05
         self.lat_cell_size = 0.05
-        nlon = round((max_lon - min_lon) / self.lon_cell_size)
-        nlat = round((max_lat - min_lat) / self.lat_cell_size)
-        print(f'grid size: ({nlon}, {nlat})')
+        self.nlon = round((max_lon - min_lon) / self.lon_cell_size)
+        self.nlat = round((max_lat - min_lat) / self.lat_cell_size)
+        print(f'grid size: ({self.nlon}, {self.nlat})')
         # save the origin of the grid
         self.min_lon = min_lon
         self.min_lat = min_lat
-        self.bin_idx = np.full((nlat, nlon), -1, dtype='int')
+        self.bin_idx = np.full((self.nlat, self.nlon), -1, dtype='int')
         # mark all the grid cells that have settlement bins
         for i in range(len(self.bins)):
             b = self.bins[i]
-            lon_idx = self.lon_to_grid_col(b.points[0][0])
-            lat_idx = self.lat_to_grid_row(b.points[0][1])
+            lon_idx = self.lon_to_grid_col(min([p[0] for p in b.points[:]]))
+            lat_idx = self.lat_to_grid_row(min([p[1] for p in b.points[:]]))
             self.bin_idx[lat_idx, lon_idx] = i
+
     def lon_to_grid_col(self, lon):
-        return int((lon - self.min_lon) / self.lon_cell_size)
+        return math.floor(round((lon - self.min_lon) / self.lon_cell_size, 6))
+
     def lat_to_grid_row(self, lat):
-        return int((lat - self.min_lat) / self.lat_cell_size)
+        return math.floor(round((lat - self.min_lat) / self.lat_cell_size, 6))
+
     def get_bin_idx(self, lon, lat):
         lon_idx = self.lon_to_grid_col(lon)
         lat_idx = self.lat_to_grid_row(lat)
         return self.bin_idx[lat_idx, lon_idx]
 
+    def plot_with_query_point(self, query_point):
+        for bidx in range(len(self.bins)):
+            b = self.bins[bidx]
+            x = [p[0] for p in b.points]
+            y = [p[1] for p in b.points]
+            # # find ourselves in the grid
+            # for col in range(self.nlon):
+            #     for row in range(self.nlat):
+            #         if self.bin_idx[row, col] == bidx:
+            #             x.append(self.min_lon + (col + 0.5) * self.lon_cell_size)
+            #             y.append(self.min_lat + (row + 0.5) * self.lat_cell_size)
+            plt.plot(x, y)
+            # break
+
+        plt.scatter(query_point.x, query_point.y, s=80, marker="*")
+        plt.show()
+
 print('creating settlement-bin lookup grid...')
 grid = Grid(bins)
 
 print('checking if start/end points fall in bins')
+missed_bin_count = 0
 startbins = []
 for i in range(len(startpoints)):
     start_bin_idx = grid.get_bin_idx(startpoints[i].x, startpoints[i].y)
+    #print(f'looking up ({startpoints[i].x}, {startpoints[i].y})')
     if start_bin_idx < 0:
-        continue  # didn't start within a bin
+        # continue  # didn't start within a bin
+        missed_bin_count += 1
+        if missed_bin_count < 1000:
+            continue  # ignore the first few, so we can look at them one-at-a-time
+
+        print(f'point {i} did not start in a bin')
+        min_dist = 1e9
+        min_bin = None
+        for b in bins:
+            lats = [p[0] for p in b.points[:]]
+            lons = [p[1] for p in b.points[:]]
+            dlats = [(startpoints[i].x - lat) for lat in lats]
+            dlons = [(startpoints[i].y - lon) for lon in lons]
+            dists = [math.sqrt(dlats[i]*dlats[i] + dlons[i]*dlons[i]) for i in range(len(dlats))]
+            if min(dists) < min_dist:
+                min_dist = min(dists)
+                min_bin = b
+        print(f'query point: {startpoints[i]}')
+        print(f'closest bin: {min_bin.points}')
+        grid.plot_with_query_point(startpoints[i])
+        sys.exit(1)
     startbins.append([i, records[start_bin_idx][0]])
 
 finalbins = []
 for i in range(len(finalpoints)):
     final_bin_idx = grid.get_bin_idx(finalpoints[i].x, finalpoints[i].y)
     if final_bin_idx < 0:
+        # print(f'point {i} did not end in a bin')
         continue  # didn't end within a bin
     finalbins.append([i, records[final_bin_idx][0]])
             
@@ -201,7 +244,6 @@ for i in range(len(musmat[0,:])):
 
 #create heatmap
 import seaborn as sns
-import matplotlib.pyplot as plt
 ax = sns.heatmap(musmattrim, mask = (musmattrim == 0))
 
 
