@@ -101,32 +101,44 @@ class Grid:
         # save the origin of the grid
         self.min_lon = min_lon
         self.min_lat = min_lat
-        self.bin_idx = np.full((self.nlat, self.nlon), -1, dtype='int')
+        self.max_lon = max_lon
+        self.max_lat = max_lat
+        self.bin_idx = np.full((self.nlon, self.nlat), -1, dtype='int')
         # mark all the grid cells that have settlement bins
         for i in range(len(self.bins)):
             b = self.bins[i]
             lon_idx = self.lon_to_grid_col(min([p[0] for p in b.points[:]]))
             lat_idx = self.lat_to_grid_row(min([p[1] for p in b.points[:]]))
-            self.bin_idx[lat_idx, lon_idx] = i
+            self.bin_idx[lon_idx, lat_idx] = i
         # assign region to each grid cell
-        self.bin_regions = np.full((self.nlat, self.nlon), -1, dtype='int')
+        self.bin_regions = np.full((self.nlon, self.nlat), -1, dtype='int')
         for i in range(len(self.bins)):
             b = self.bins[i]
             lon_idx = self.lon_to_grid_col(min([p[0] for p in b.points[:]]))
             lat_idx = self.lat_to_grid_row(min([p[1] for p in b.points[:]]))
-            self.bin_regions[lat_idx, lon_idx] = records[i][5]-1
+            self.bin_regions[lon_idx, lat_idx] = records[i][6]-1
     def lon_to_grid_col(self, lon):
+        if lon < 0:
+            lon += 360
+        if lon < self.min_lon:
+            lon = self.min_lon
+        if lon > self.max_lon:
+            lon = self.max_lon - .01
         return math.floor(round((lon - self.min_lon) / self.lon_cell_size, 6))
     def lat_to_grid_row(self, lat):
+        if lat < self.min_lat:
+            lat = self.min_lat
+        if lat > self.max_lat:
+            lat = self.max_lat - .01
         return math.floor(round((lat - self.min_lat) / self.lat_cell_size, 6))
     def get_bin_idx(self, lon, lat):
         lon_idx = self.lon_to_grid_col(lon)
         lat_idx = self.lat_to_grid_row(lat)
-        return self.bin_idx[lat_idx, lon_idx]
+        return self.bin_idx[lon_idx, lat_idx]
     def get_bin_region(self, lon, lat):
         lon_idx = self.lon_to_grid_col(lon)
         lat_idx = self.lat_to_grid_row(lat)
-        return self.bin_regions[lat_idx, lon_idx]
+        return self.bin_regions[lon_idx, lat_idx]
     def plot_with_query_point(self, query_point):
         for bidx in range(len(self.bins)):
             b = self.bins[bidx]
@@ -179,7 +191,7 @@ finalbins = []
 for i in range(len(finalpoints)):
     final_bin_idx = grid.get_bin_idx(finalpoints[i].x, finalpoints[i].y)
     if final_bin_idx < 0:
-        # print(f'point {i} did not end in a bin')
+        #print(f'point {i} did not end in a bin')
         continue  # didn't end within a bin
     finalbins.append([i, records[final_bin_idx][0]])
             
@@ -242,8 +254,8 @@ ax = sns.heatmap(musmattrim, mask = (musmattrim == 0))
 
 
 
-#create conmat based on regions
-regionconmat = np.zeros((11, 12))
+#create conmat based on regions. set np.zeros((11,12)) if using quota areas
+regionconmat = np.zeros((14, 15))
 
 startfinalregions = []
 for i in range(len(finalpoints)):
@@ -259,7 +271,7 @@ for i in startfinalregions:
             regionconmat[i[0], i[1]] += 1
 
 #convert to percent settlers
-regionconmatpercent = np.zeros((11, 12))
+regionconmatpercent = np.zeros((14, 15))
 for i in range(10):
     if sum(regionconmat[i]) > 0:
         regionconmatpercent[i] = regionconmat[i]/sum(regionconmat[i])
@@ -269,8 +281,9 @@ regionconmatpercent = regionconmatpercent[:,:-1]
 #assign region names to dataframe
 import pandas as pd
 
-labs = ['GLM9','GLM1','GLM2','GLM3_east','Chatham Islands', 'GLM3_west','Stewart Island', 'Auckland Islands','GLM7B','GLM7A','GLM8']
-df = pd.DataFrame(data = regionconmatpercent, index = labs, columns = labs)
+quotalabs = ['GLM9','GLM1','GLM2','GLM3_east','Chatham Islands', 'GLM3_west','Stewart Island', 'Auckland Islands','GLM7B','GLM7A','GLM8']
+regionlabs = ['waikato', '90milebeach_northland', 'hauraki_northland', 'bay_of_plenty', 'hawkes_bay', 'wellington_wairarapa', 'canterbury', 'otago', 'southland', 'fiordland', 'west_coast', 'nelson_marlborough', 'wanganui', 'taranaki']
+df = pd.DataFrame(data = regionconmatpercent, index = regionlabs, columns = regionlabs)
 
 
 #create regional heatmap
