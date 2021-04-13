@@ -1,17 +1,5 @@
 #!/usr/bin/env python
 
-import numpy as np
-import netCDF4 as nc
-import matplotlib.pyplot as plt
-import math
-import shapely
-from shapely.geometry import Point
-from shapely.geometry import shape
-import shapefile
-import random
-from scipy import stats
-from mpl_toolkits.basemap import Basemap
-
 
 mau201604 = '/nesi/project/vuw03073/testScripts/ntest_MAU_201604.nc'
 cap201604 = '/nesi/project/vuw03073/testScripts/ntest_CAP_201604.nc'
