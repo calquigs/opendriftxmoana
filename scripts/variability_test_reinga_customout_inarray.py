@@ -142,9 +142,6 @@ for i in range(len(lons_end)):
 
 outFile.close()
 
-#o.plot(filename = "nparticles_test.jpg")
-
-#o.animation(filename = "14mussels_2015.mp4")
 
 
 
