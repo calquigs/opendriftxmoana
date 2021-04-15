@@ -9,7 +9,7 @@ import math
 #from mpl_toolkits.basemap import Basemap
 from timeit import default_timer as timer
 import shapely
-from shapely.geometry import Point
+from shapely.geometry import Point, Polygon
 from shapely.geometry import shape
 import shapefile
 import seaborn as sns
@@ -63,14 +63,29 @@ def nc_to_startfinal_points(nc_in):
         sfpoints.append([startpoints[i], finalpoints[i], finalstatus[i]])
     return sfpoints
 
+def customout_to_startfinal_points(txt_in):
+    inFile = open(txt_in, 'r')
+    sfpoints = []
+    for line in inFile:
+        line = line.strip()
+        elems = line.split(',')
+        sfpoints.append([Point(float(elems[0]), float(elems[1])), Point(float(elems[2]), float(elems[3])), int(elems[4])])
+    return sfpoints
+
+
 ########################################
 #read in settlement bins and create grid
 ########################################
-shape_filename = os.path.expanduser("~/Desktop/rho_settlement_bins/rho_settlement_bins.shp")
+shape_filename = "rho_settlement_bins/rho_settlement_bins.shp"
 shp = shapefile.Reader(shape_filename)
 bins = shp.shapes()
 records = shp.records()
 
+pts = bins[0].points
+pts = [list(elem) for elem in pts]
+poly = Polygon(pts)
+point = Point(lon,lat)
+poly.contain(point)
 class Grid:
     def __init__(self, bins, records):
         self.bins = bins
@@ -258,9 +273,9 @@ def plot_sfpoints(sfpoints):
             fx = i[1].x
             fy = i[1].y
             plt.plot(sx, sy, 'go')
-            if i[2] == 'active':
+            if i[2] == 0:
                 plt.plot(fx, fy, 'bo')
-            if i[2] == 'died':
+            if i[2] == 1:
                 plt.plot(fx, fy, 'yo')
             if i[2] == 'settled_on_coast':
                 plt.plot(fx, fy, 'ro')
