@@ -36,8 +36,8 @@ data_paths = [data_path0, data_path1, data_path2, data_path3, data_path4, data_p
 
 
 reader_moana_0 = reader_ROMS_native_MOANA.Reader(data_paths[start_month]) # load data for that year
-reader_moana_1 = reader_ROMS_native_MOANA.Reader(data_paths[start_month]) # load data for that year
-reader_moana_2 = reader_ROMS_native_MOANA.Reader(data_paths[start_month]) # load data for that year
+reader_moana_1 = reader_ROMS_native_MOANA.Reader(data_paths[start_month+1]) # load data for that year
+reader_moana_2 = reader_ROMS_native_MOANA.Reader(data_paths[start_month+2]) # load data for that year
 reader_moana_0.multiprocessing_fail = True # bypass the use of multi core for coordinates conversion and seems to make the model run much faster.
 reader_moana_1.multiprocessing_fail = True # bypass the use of multi core for coordinates conversion and seems to make the model run much faster.
 reader_moana_2.multiprocessing_fail = True # bypass the use of multi core for coordinates conversion and seems to make the model run much faster.

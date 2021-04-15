@@ -23,17 +23,17 @@ module load Miniconda3
 source activate opendrift_simon
 
 #create temporary directory for storing output
-mkdir run_${SLURM_ARRAY_TASK_ID}
-cd run_${SLURM_ARRAY_TASK_ID}
+#mkdir tmp_run
+#cd tmp_run
 
 #run jobs
-python /nesi/project/vuw03073/opendriftxmoana/variability_test_reinga_customout.py ${SLURM_ARRAY_TASK_ID}
+python /nesi/project/vuw03073/opendriftxmoana/scripts/variability_test_reinga_customout_inarray.py ${SLURM_ARRAY_TASK_ID}
 
 #stitch files
-cat variability_test_reinga_* > ../variability_test_reinga_inarray.txt
+#cat variability_test_reinga_* > ../variability_test_reinga_inarray.txt
 
 #exit and delete temporary directory
-cd ..
-rm -r run_${SLURM_ARRAY_TASK_ID}
+#cd ..
+#rm -r run_${SLURM_ARRAY_TASK_ID}
 
 
