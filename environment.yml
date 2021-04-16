@@ -1,4 +1,4 @@
-name: opendrift
+name: opendriftxmoana
 channels:
   - conda-forge
   - noaa-orr-erd
