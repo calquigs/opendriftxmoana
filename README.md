@@ -2,28 +2,22 @@
 
 ## Running OpenDrift scripts
 
-### Requirements
+### Installing dependencies
 
 
 We recommend using a virtual environment to install all dependencies for this project. [miniconda](https://docs.conda.io/en/latest/miniconda.html) is a good way to create a virtual environment with specific versions of Python, working on all major plateforms (Windows, MacOs and Linux).
 
 After installing miniconda, you can create a virtual environment from a terminal as follows:
 ```
-conda create -n opendrift python=3.8
+conda env create -f environment.yml
 ```
-where `opendrift` is the name of the virtual environment
+This will create the opendriftxmoana environment. 
 
 Everytime you want to work on the project, you need to *activate* it before: 
 ```
-conda activate opendrift
+conda activate opendriftxmoana
 ```
-You should see `(opendrift)` prepended to your command line prompt as a hint that it is now activated.
-
-To install all the dependencies, once the virtual environment has been activated, you can use `pip` in the same terminal:
-```
-pip install -r requirements.txt
-```
-from the folder of the repository. You only need to do this once.
+You should see `(opendriftxmoana)` prepended to your command line prompt as a hint that it is now activated.
 
 To deactivate the environment, type
 ```
