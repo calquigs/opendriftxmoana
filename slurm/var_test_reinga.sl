@@ -9,7 +9,7 @@
 #SBATCH --mail-type=ALL                         #This will send you an email when the STARTS and ENDS		 $
 #SBATCH --mail-user=calquigs@gmail.com          #Enter your email address.                                       $
 #SBATCH --profile=task
-#SBATCH --array=0-4                     # Array jobs
+#SBATCH --array=0-11                     # Array jobs
 
 #SBATCH --export NONE
 
@@ -22,18 +22,8 @@ module purge
 module load Miniconda3
 source activate opendrift_simon
 
-#create temporary directory for storing output
-#mkdir tmp_run
-#cd tmp_run
-
 #run jobs
-python /nesi/project/vuw03073/opendriftxmoana/scripts/variability_test_reinga_customout_inarray.py ${SLURM_ARRAY_TASK_ID}
+python /nesi/project/vuw03073/opendriftxmoana/scripts/var_test_reinga/var_test_reinga_1994.py ${SLURM_ARRAY_TASK_ID}
 
-#stitch files
-#cat variability_test_reinga_* > ../variability_test_reinga_inarray.txt
-
-#exit and delete temporary directory
-#cd ..
-#rm -r run_${SLURM_ARRAY_TASK_ID}
 
 

@@ -10,7 +10,7 @@ from opendrift.readers import reader_ROMS_native_MOANA
 from opendrift.models.bivalvelarvae import BivalveLarvae
 
 start_month = int(sys.argv[1])
-months = ['201512', '201601', '201602', '201603', '201604']
+months = ['200601','200602','200603','200604','200605','200606','200607','200608','200609','200610','200611','200612']
 ###############################
 # MODEL SELECTION
 ###############################
@@ -21,23 +21,31 @@ o = BivalveLarvae(loglevel=0)#,logfile='mussel_forwardtrack_%s_%s.log' % (year,m
 
 
 
-data_path0 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201512.nc'
-data_path1 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201601.nc'
-data_path2 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201602.nc'
-data_path3 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201603.nc'
-data_path4 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201604.nc'
-data_path5 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201605.nc'
-data_path6 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201606.nc'
+path200601 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200601.nc'
+path200602 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200602.nc'
+path200603 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200603.nc'
+path200604 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200604.nc'
+path200605 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200605.nc'
+path200606 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200606.nc'
+path200607 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200607.nc'
+path200608 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200608.nc'
+path200609 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200609.nc'
+path200610 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200610.nc'
+path200611 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200611.nc'
+path200612 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200612.nc'
+path200701 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200701.nc'
+path200702 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200702.nc'
 
-data_paths = [data_path0, data_path1, data_path2, data_path3, data_path4, data_path5, data_path6]
+
+paths = [path200601, path200602, path200603, path200604, path200605, path200606, path200607, path200608, path200609, path200610, path200611, path200612, path200701, path200702]
 
 # reader_moana_dec15 = reader_ROMS_native_MOANA.Reader(data_path+"nz5km_his_201707.nc") # load data for that year
 # reader_moana_dec15.multiprocessing_fail = True # thisb ypasses the use of multi core for coordinates conversion and seems to make the model run much faster.
 
 
-reader_moana_0 = reader_ROMS_native_MOANA.Reader(data_paths[start_month]) # load data for that year
-reader_moana_1 = reader_ROMS_native_MOANA.Reader(data_paths[start_month+1]) # load data for that year
-reader_moana_2 = reader_ROMS_native_MOANA.Reader(data_paths[start_month+2]) # load data for that year
+reader_moana_0 = reader_ROMS_native_MOANA.Reader(paths[start_month]) # load data for that year
+reader_moana_1 = reader_ROMS_native_MOANA.Reader(paths[start_month+1]) # load data for that year
+reader_moana_2 = reader_ROMS_native_MOANA.Reader(paths[start_month+2]) # load data for that year
 reader_moana_0.multiprocessing_fail = True # bypass the use of multi core for coordinates conversion and seems to make the model run much faster.
 reader_moana_1.multiprocessing_fail = True # bypass the use of multi core for coordinates conversion and seems to make the model run much faster.
 reader_moana_2.multiprocessing_fail = True # bypass the use of multi core for coordinates conversion and seems to make the model run much faster.
@@ -54,9 +62,9 @@ o.set_config('general:use_auto_landmask', False) # prevent opendrift from making
 ###############################
 # PARTICLE SEEDING
 ###############################
-#Reinga
-lons = [172.75, 172.8, 172.8, 172.75]
-lats = [-34.3, -34.3, -34.35, -34.35]
+#Dunedin
+lons = [170.75, 170.8, 170.8, 170.75]
+lats = [-45.95, -45.95, -46, -46]
 
 def create_seed_times(start, end, delta):
   """

@@ -1,57 +1,22 @@
 #!/usr/bin/env python
 
-
-mau201604 = '/nesi/project/vuw03073/testScripts/ntest_MAU_201604.nc'
-cap201604 = '/nesi/project/vuw03073/testScripts/ntest_CAP_201604.nc'
-west201604 = '/nesi/project/vuw03073/testScripts/ntest_WEST_201604.nc'
-fle201604 = '/nesi/project/vuw03073/testScripts/ntest_FLE_201604.nc'
-tas201604 = '/nesi/project/vuw03073/testScripts/ntest_TAS_201604.nc'
-cam201604 = '/nesi/project/vuw03073/testScripts/ntest_CAM_201604.nc'
-lwr201604 = '/nesi/project/vuw03073/testScripts/ntest_LWR_201604.nc'
-kai201604 = '/nesi/project/vuw03073/testScripts/ntest_KAI_201604.nc'
-gob201604 = '/nesi/project/vuw03073/testScripts/ntest_GOB_201604.nc'
-tim201604 = '/nesi/project/vuw03073/testScripts/ntest_TIM_201604.nc'
-fio201604 = '/nesi/project/vuw03073/testScripts/ntest_FIO_201604.nc'
-hsb201604 = '/nesi/project/vuw03073/testScripts/ntest_HSB_201604.nc'
-bgb201604 = '/nesi/project/vuw03073/testScripts/ntest_BGB_201604.nc'
-
-
-mau201604_pts = []
-cap201604_pts = []
-west201604_pts = []
-fle201604_pts = []
-tas201604_pts = []
-cam201604_pts = []
-lwr201604_pts = []
-kai201604_pts = []
-gob201604_pts = []
-tim201604_pts = []
-fio201604_pts = []
-hsb201604_pts = []
-bgb201604_pts = []
-
-mau201604_fuv = []
-cap201604_fuv = []
-west201604_fuv = []
-fle201604_fuv = []
-tas201604_fuv = []
-cam201604_fuv = []
-lwr201604_fuv = []
-kai201604_fuv = []
-gob201604_fuv = []
-tim201604_fuv = []
-fio201604_fuv = []
-hsb201604_fuv = []
-bgb201604_fuv = []
-
-fns = [mau201604,cap201604,west201604,fle201604,tas201604,cam201604,\
-lwr201604,kai201604,gob201604,tim201604,fio201604,hsb201604,bgb201604]
-
-pts = [mau201604_pts,cap201604_pts,west201604_pts,fle201604_pts,tas201604_pts,cam201604_pts,\
-lwr201604_pts,kai201604_pts,gob201604_pts,tim201604_pts,fio201604_pts,hsb201604_pts,bgb201604_pts]
-
-fuvs = [mau201604_fuv,cap201604_fuv,west201604_fuv,fle201604_fuv,tas201604_fuv,cam201604_fuv,\
-lwr201604_fuv,kai201604_fuv,gob201604_fuv,tim201604_fuv,fio201604_fuv,hsb201604_fuv,bgb201604_fuv]
+import os
+import sys
+import numpy as np
+import netCDF4 as nc
+import matplotlib.pyplot as plt
+import math
+#from mpl_toolkits.basemap import Basemap
+from timeit import default_timer as timer
+import shapely
+from shapely.geometry import Point, Polygon
+from shapely.geometry import shape
+import shapefile
+import seaborn as sns
+import pandas as pd
+from mpl_toolkits.basemap import Basemap
+import random
+from scipy import stats
 
 ######################
 #extract data from .nc
@@ -99,6 +64,16 @@ def nc_to_startfinal_points(nc_in):
     for i in range(len(startpoints)):
         sfpoints.append([startpoints[i], finalpoints[i], finalstatus[i]])
     return sfpoints
+
+def customout_to_startfinal_points(txt_in):
+    inFile = open(txt_in, 'r')
+    sfpoints = []
+    for line in inFile:
+        line = line.strip()
+        elems = line.split(',')
+        sfpoints.append([Point(float(elems[0]), float(elems[1])), Point(float(elems[2]), float(elems[3])), int(elems[4])])
+    return sfpoints
+
 
 ########################################
 #read in settlement bins and create grid
@@ -212,8 +187,8 @@ def plot_pdd(sfpoints):
     H, _, _ = np.histogram2d(y, x, [lat_edges, lon_edges], density = True)
     H[H==0]=None
     lon_bins_2d, lat_bins_2d = np.meshgrid(lon_edges, lat_edges)
-    #m = Basemap(resolution= 'h', llcrnrlon = 165, llcrnrlat = -52, urcrnrlon = 184, urcrnrlat = -32)
-    m = Basemap(resolution= 'h', llcrnrlon = 170, llcrnrlat = -36, urcrnrlon = 175, urcrnrlat = -33)
+    m = Basemap(resolution= 'h', llcrnrlon = 165, llcrnrlat = -52, urcrnrlon = 184, urcrnrlat = -32)
+    #m = Basemap(resolution= 'h', llcrnrlon = 170, llcrnrlat = -36, urcrnrlon = 175, urcrnrlat = -33)
     m.drawcoastlines()
     m.fillcontinents(color='white')
     xs, ys = m(lon_bins_2d, lat_bins_2d)
