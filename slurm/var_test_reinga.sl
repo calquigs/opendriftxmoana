@@ -23,7 +23,10 @@ module load Miniconda3
 source activate opendrift_simon
 
 #run jobs
-python /nesi/project/vuw03073/opendriftxmoana/scripts/var_test_reinga/var_test_reinga_1994.py ${SLURM_ARRAY_TASK_ID}
-
+#Is this a good way to repeat a job array for multiple scripts? Will the memory/walltime requested in the header apply to 1loop iteration * 1array iteration?
+for script in /nesi/project/vuw03073/opendriftxmoana/scripts/var_test_reinga/
+do
+  python script ${SLURM_ARRAY_TASK_ID}
+done
 
 
