@@ -143,7 +143,7 @@ lats_end = lats[index_of_last, range(lons.shape[1])]
 status_end = status[index_of_last, range(lons.shape[1])]
 
 
-outFile = open(f'variability_test_reinga_{months[start_month]}.txt','w')
+outFile = open(f'variability_test_dunedin_{months[start_month]}.txt','w')
 
 for i in range(len(lons_end)):
   outFile.write(str(lons_start[i])+","+str(lats_start[i])+","+str(lons_end[i])+","+str(lats_end[i])+","+str(status_end[i])+"\n")
