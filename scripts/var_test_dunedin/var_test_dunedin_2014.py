@@ -10,7 +10,7 @@ from opendrift.readers import reader_ROMS_native_MOANA
 from opendrift.models.bivalvelarvae import BivalveLarvae
 
 start_month = int(sys.argv[1])
-months = ['200601','200602','200603','200604','200605','200606','200607','200608','200609','200610','200611','200612']
+months = ['201401','201402','201403','201404','201405','201406','201407','201408','201409','201410','201411','201412']
 ###############################
 # MODEL SELECTION
 ###############################
@@ -21,23 +21,23 @@ o = BivalveLarvae(loglevel=0)#,logfile='mussel_forwardtrack_%s_%s.log' % (year,m
 
 
 
-path200601 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200601.nc'
-path200602 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200602.nc'
-path200603 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200603.nc'
-path200604 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200604.nc'
-path200605 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200605.nc'
-path200606 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200606.nc'
-path200607 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200607.nc'
-path200608 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200608.nc'
-path200609 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200609.nc'
-path200610 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200610.nc'
-path200611 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200611.nc'
-path200612 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200612.nc'
-path200701 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200701.nc'
-path200702 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200702.nc'
+path201401 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201401.nc'
+path201402 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201402.nc'
+path201403 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201403.nc'
+path201404 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201404.nc'
+path201405 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201405.nc'
+path201406 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201406.nc'
+path201407 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201407.nc'
+path201408 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201408.nc'
+path201409 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201409.nc'
+path201410 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201410.nc'
+path201411 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201411.nc'
+path201412 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201412.nc'
+path201501 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201501.nc'
+path201502 = '/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_201502.nc'
 
 
-paths = [path200601, path200602, path200603, path200604, path200605, path200606, path200607, path200608, path200609, path200610, path200611, path200612, path200701, path200702]
+paths = [path201401, path201402, path201403, path201404, path201405, path201406, path201407, path201408, path201409, path201410, path201411, path201412, path201501, path201502]
 
 # reader_moana_dec15 = reader_ROMS_native_MOANA.Reader(data_path+"nz5km_his_201707.nc") # load data for that year
 # reader_moana_dec15.multiprocessing_fail = True # thisb ypasses the use of multi core for coordinates conversion and seems to make the model run much faster.
@@ -143,7 +143,7 @@ lats_end = lats[index_of_last, range(lons.shape[1])]
 status_end = status[index_of_last, range(lons.shape[1])]
 
 
-outFile = open(f'variability_test_reinga_{months[start_month]}.txt','w')
+outFile = open(f'variability_test_dunedin_{months[start_month]}.txt','w')
 
 for i in range(len(lons_end)):
   outFile.write(str(lons_start[i])+","+str(lats_start[i])+","+str(lons_end[i])+","+str(lats_end[i])+","+str(status_end[i])+"\n")
