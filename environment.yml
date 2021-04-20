@@ -1,8 +1,36 @@
 name: opendriftxmoana
 channels:
-  - conda-forge
-  - noaa-orr-erd
   - opendrift
+  - conda-forge
+  - NOAA-ORR-ERD
 dependencies:
   - python=3.9
-  - opendrift
+  - matplotlib>=3.1
+  - numpy>=1.17
+  - scipy>=1.6
+  - netcdf4
+  - ffmpeg
+  - pyproj>=2.3
+  - libgdal>=3.1
+  - gdal>=3.1
+  - xarray
+  - dask>=2021.03.1
+  - cfgrib
+  - pygrib
+  - xhistogram<=0.1.2
+  - requests
+  - pytest
+  - pytest-cov
+  - pytest-benchmark
+  - cartopy
+  - nc-time-axis
+  - geojson
+  - opendrift-landmask-data
+  - oil_library-opendrift>=2+noaa1.1.3
+  - isodate
+  - coloredlogs
+  - cmocean
+  - pip
+  - pip:
+    - motuclient
+    - "--editable=git+https://github.com/simonweppe/opendrift@b5742714a0008e46af185a794d040ffeaa59d493#egg=opendrift"
