@@ -18,6 +18,9 @@ from mpl_toolkits.basemap import Basemap
 import random
 from scipy import stats
 
+txt_in = sys.argv[1]
+
+
 ######################
 #extract data from .nc
 ######################
@@ -78,7 +81,7 @@ def customout_to_startfinal_points(txt_in):
 ########################################
 #read in settlement bins and create grid
 ########################################
-shape_filename = "rho_settlement_bins/rho_settlement_bins.shp"
+shape_filename = "/nesi/project/vuw03073/rho_settlement_bins/rho_settlement_bins.shp"
 shp = shapefile.Reader(shape_filename)
 bins = shp.shapes()
 records = shp.records()
@@ -325,14 +328,8 @@ def fuv_curve(fuv_data0, label):
 
 ns = [100,500,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,20000,30000,40000,50000]
 
-for fn, pt, fuv0 in zip(fns, pts, fuvs):
-    print(f'opening file {str(fn)}')
-    pt = nc_to_startfinal_points(fn)
-    print(f'calculating fuv for {str(fn)}')
-    fuv0 = fuv_data(pt, ns, 100)
-
-for fuv0 in fuvs:
-    print(fuv0)
-
+sfpoints = customout_to_startfinal_points(txt_in)
+fuv_data0 = fuv_data(sfpoints, ns, 100)
+print(fuv_data0)
 
 
