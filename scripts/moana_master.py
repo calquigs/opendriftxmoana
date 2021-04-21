@@ -87,11 +87,11 @@ times = create_seed_times(reader0.start_time,
                           reader0.end_time, timedelta(hours = 2))
 
 
-number = 100
+number = 55
 z = np.random.uniform(-10,0,size=len(times)) # generate random depth
 
-for time in times:
-  o.seed_within_polygon(lons, lats, number = number, time = time, z = z[i])
+for i in range(len(times)):
+  o.seed_within_polygon(lons, lats, number = number, time = times[i], z = z[i])
 
 
 ###############################

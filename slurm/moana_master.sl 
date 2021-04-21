@@ -9,7 +9,7 @@
 #SBATCH --mail-type=ALL                         #This will send you an email when the STARTS and ENDS		 $
 #SBATCH --mail-user=calquigs@gmail.com          #Enter your email address.                                       $
 #SBATCH --profile=task
-#SBATCH --array=0-1                     # Array jobs
+#SBATCH --array=0-275                     # Array jobs
 
 #SBATCH --export NONE
 
@@ -44,6 +44,6 @@ done
 
 
 #run jobs
-python /nesi/project/vuw03073/opendriftxmoana/scripts/moana_master.py -i inPath -o outPath -n name -ym ym[$SLURM_ARRAY_TASK_ID] -lon lon -lat lat
+python /nesi/project/vuw03073/opendriftxmoana/scripts/moana_master.py -i $inPath -o $outPath -n $name -ym ${ym[$SLURM_ARRAY_TASK_ID]} -lon $lon -lat $lat
 
 
