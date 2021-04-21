@@ -16,20 +16,21 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Run opendrift simulation')
 parser.add_argument('-i', '--input', type=str, required=True, help='Input reaader file path (ending in /)')
-parser.add_argument('-o', '--output', type=str, help='Output file path')
+parser.add_argument('-o', '--output', type=str, help='Output file path (ending in /')
 parser.add_argument('-n', '--name', type=str, default='opendrift', help='Output file name')
-parser.add_argument('-m', '--month', type=int, required=True, help='Month of the year to seed (mm)')
-parser.add_argument('-y', '--year', type=int, required=True, help='Year to run simulation (yyyy)')
-parser.add_argument('-lon' '--upperleftlon', type=float, required=True, help='Longitude of upper left hand corner of .05 deg bin to seed')
-parser.add_argument('-lat' '--upperleftlat', type=float, required=True, help='Latitude of upper left hand corner of .05 deg bin to seed')
+parser.add_argument('-ym', '--yearmonth', type=int, required=True, help='Month and year to seed (yyyymm)')
+parser.add_argument('-lon', '--upperleftlon', type=float, required=True, help='Longitude of upper left hand corner of .05 deg bin to seed')
+parser.add_argument('-lat', '--upperleftlat', type=float, required=True, help='Latitude of upper left hand corner of .05 deg bin to seed')
 
 args = parser.parse_args()
 
 ###############################
 #Create Readers
 ###############################
-
-date0 = datetime(args.year, args.month, 1)
+yyyymm = str(args.yearmonth)
+mm = int(yyyymm[-2:])
+yyyy = int(yyyymm[0:4])
+date0 = datetime(yyyy, mm, 1)
 mm0 = date0.strftime('%m')
 yyyy0 = date0.strftime('%Y')
 date1 = date0 + timedelta(days = 30)
@@ -139,7 +140,7 @@ lons_end = lons[index_of_last, range(lons.shape[1])]
 lats_end = lats[index_of_last, range(lons.shape[1])]
 status_end = status[index_of_last, range(lons.shape[1])]
 
-outFile = open(f'{args.name}_{yyyy0}{mm0}.txt','w')
+outFile = open(f'{args.output}{args.name}_{yyyy0}{mm0}.txt','w')
 
 for i in range(len(lons_end)):
   outFile.write(str(lons_start[i])+","+str(lats_start[i])+","+str(lons_end[i])+","+str(lats_end[i])+","+str(status_end[i])+"\n")
