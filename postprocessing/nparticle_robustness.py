@@ -5,6 +5,7 @@ import sys
 import numpy as np
 import netCDF4 as nc
 import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
 import math
 #from mpl_toolkits.basemap import Basemap
 from timeit import default_timer as timer
@@ -211,13 +212,14 @@ def compare_pdd_plots(sfpoints, ns):
         H, _, _ = np.histogram2d(y, x, [lat_edges, lon_edges], density = True)
         H[H==0]=None
         lon_bins_2d, lat_bins_2d = np.meshgrid(lon_edges, lat_edges)
-        #m = Basemap(resolution= 'h', llcrnrlon = 165, llcrnrlat = -52, urcrnrlon = 184, urcrnrlat = -32)
         axes[count].set_title(f"{n} particles")
-        m = Basemap(resolution= 'h', llcrnrlon = 170, llcrnrlat = -36, urcrnrlon = 175, urcrnrlat = -33, ax = axes[count])
+        m = Basemap(resolution= 'h', llcrnrlon = 169, llcrnrlat = -46, urcrnrlon = 179, urcrnrlat = -41, ax = axes[count])
+        #m = Basemap(resolution= 'h', llcrnrlon = 165, llcrnrlat = -52, urcrnrlon = 184, urcrnrlat = -32, ax = axes[count])
         m.drawcoastlines()
         m.fillcontinents(color='white')
         xs, ys = m(lon_bins_2d, lat_bins_2d)
         axes[count].pcolormesh(xs, ys, H, cmap = 'jet')
+        axes[count].add_patch(Rectangle((170.75, -46), .2,.2, edgecolor = 'green', fill=False))
         count += 1
     x = [sfpoints[i][1].x for i in range(len(sfpoints))]
     y = [sfpoints[i][1].y for i in range(len(sfpoints))]
@@ -226,14 +228,15 @@ def compare_pdd_plots(sfpoints, ns):
     H, _, _ = np.histogram2d(y, x, [lat_edges, lon_edges], density = True)
     H[H==0]=None
     lon_bins_2d, lat_bins_2d = np.meshgrid(lon_edges, lat_edges)
-    #m = Basemap(resolution= 'h', llcrnrlon = 165, llcrnrlat = -52, urcrnrlon = 184, urcrnrlat = -32)
     axes[count].set_title(f"{len(sfpoints)} particles")
-    m = Basemap(resolution= 'h', llcrnrlon = 170, llcrnrlat = -36, urcrnrlon = 175, urcrnrlat = -33)
+    #m = Basemap(resolution= 'h', llcrnrlon = 170, llcrnrlat = -36, urcrnrlon = 175, urcrnrlat = -33)
+    m = Basemap(resolution= 'h', llcrnrlon = 169, llcrnrlat = -46, urcrnrlon = 179, urcrnrlat = -41, ax = axes[count])
     m.drawcoastlines()
     m.fillcontinents(color='white')
     xs, ys = m(lon_bins_2d, lat_bins_2d)
     axes[count].pcolormesh(xs, ys, H, cmap = 'jet')
-
+    axes[count].add_patch(Rectangle((170.75, -46), .2,.2, edgecolor = 'green', fill=False))
+    fig.suptitle('Dunedin, June 2016')
 
 #######################
 #bootstrap from ref_pdd
@@ -330,6 +333,8 @@ ns = [100,500,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,20000,30000,400
 
 sfpoints = customout_to_startfinal_points(txt_in)
 fuv_data0 = fuv_data(sfpoints, ns, 100)
-print(fuv_data0)
+outFile = open(f'dunedin_fuv_{txt_in[-9:-3]}.txt', 'w')
+outFile.write(fuv_data0)
+outFile.close()
 
 
