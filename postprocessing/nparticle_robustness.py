@@ -330,7 +330,7 @@ ns = [100,500,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,20000]
 
 sfpoints = customout_to_startfinal_points(txt_in)
 fuv_data0 = fuv_data(sfpoints, ns, 100)
-outFile = open(f'dunedin_fuv/dunedin_fuv_{txt_in[-10:-4]}.txt', 'w')
+outFile = open(f'reinga_fuv/reinga_fuv_{txt_in[-10:-4]}.txt', 'w')
 for row in fuv_data0:
     np.savetxt(outFile, row)
 
