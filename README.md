@@ -10,7 +10,7 @@ We recommend using a virtual environment to install all dependencies for this pr
 After installing miniconda, you need to install [OpenDrift (forked version)](https://github.com/simonweppe/opendrift):
 ```
 git clone https://github.com/simonweppe/opendrift
-cd opendrift_simon
+cd opendrift
 conda env create -f environment.yml
 conda activate opendrift_simon
 pip install -e .
