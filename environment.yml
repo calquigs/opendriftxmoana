@@ -1,8 +1,0 @@
-name: opendriftxmoana
-channels:
-  - conda-forge
-  - noaa-orr-erd
-  - opendrift
-dependencies:
-  - python=3.9
-  - opendrift

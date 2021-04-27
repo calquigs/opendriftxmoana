@@ -7,17 +7,20 @@
 
 We recommend using a virtual environment to install all dependencies for this project. [miniconda](https://docs.conda.io/en/latest/miniconda.html) is a good way to create a virtual environment with specific versions of Python, working on all major plateforms (Windows, MacOs and Linux).
 
-After installing miniconda, you can create a virtual environment from a terminal as follows:
+After installing miniconda, you need to install [OpenDrift (forked version)](https://github.com/simonweppe/opendrift):
 ```
+git clone https://github.com/simonweppe/opendrift
+cd opendrift
 conda env create -f environment.yml
+conda activate opendrift
+pip install -e .
 ```
-This will create the opendriftxmoana environment. 
 
 Everytime you want to work on the project, you need to *activate* it before: 
 ```
-conda activate opendriftxmoana
+conda activate opendrift
 ```
-You should see `(opendriftxmoana)` prepended to your command line prompt as a hint that it is now activated.
+You should see `(opendrift)` prepended to your command line prompt as a hint that it is now activated.
 
 To deactivate the environment, type
 ```
