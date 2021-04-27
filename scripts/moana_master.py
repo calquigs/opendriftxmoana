@@ -33,16 +33,21 @@ yyyy = int(yyyymm[0:4])
 date0 = datetime(yyyy, mm, 1)
 mm0 = date0.strftime('%m')
 yyyy0 = date0.strftime('%Y')
-date1 = date0 + timedelta(days = 30)
+date1 = date0 + timedelta(days = 31)
 mm1 = date1.strftime('%m')
 yyyy1 = date1.strftime('%Y')
-date2 = date1 + timedelta(days = 30)
+date2 = date1 + timedelta(days = 31)
 mm2 = date2.strftime('%m')
 yyyy2 = date2.strftime('%Y')
 
 path0 = args.input + 'nz5km_his_' + yyyy0 + mm0 + '.nc'
 path1 = args.input + 'nz5km_his_' + yyyy1 + mm1 + '.nc'
 path2 = args.input + 'nz5km_his_' + yyyy2 + mm2 + '.nc'
+
+print(path0)
+print(path1)
+print(path2)
+
 
 reader0 = reader_ROMS_native_MOANA.Reader(path0)
 reader1 = reader_ROMS_native_MOANA.Reader(path1)
@@ -70,6 +75,8 @@ ullat = args.upperleftlat
 lons = [ullon, ullon+.05, ullon+.05, ullon]
 lats = [ullat, ullat, ullat-.05, ullat-.05]
 
+print(lons)
+print(lats)
 
 def create_seed_times(start, end, delta):
   """
@@ -112,7 +119,8 @@ o.set_config('environment:fallback:ocean_vertical_diffusivity', Kz)
 o.set_config('seed:ocean_only',True)
 o.set_config('drift:advection_scheme','runge-kutta4')
 o.set_config('drift:current_uncertainty', 0.0)
-o.set_config('drift:max_age_seconds', 3600*24*30)
+o.set_config('drift:max_age_seconds', 3600*24*35)
+o.set_config('drift:min_settlement_age_seconds', 3600*24*21)
 o.set_config('drift:lift_to_seafloor',True)
 o.set_config('drift:vertical_mixing', False)
 o.set_config('general:coastline_action','previous')
@@ -125,6 +133,8 @@ o.list_config()
 
 lons_start = o.elements_scheduled.lon
 lats_start = o.elements_scheduled.lat
+
+o.plot()
 
 o.run(stop_on_error=False,
       end_time=reader2.end_time,
@@ -139,6 +149,7 @@ status = o.get_property('status')[0]
 lons_end = lons[index_of_last, range(lons.shape[1])]
 lats_end = lats[index_of_last, range(lons.shape[1])]
 status_end = status[index_of_last, range(lons.shape[1])]
+print(o.status_categories)
 
 outFile = open(f'{args.output}{args.name}_{yyyy0}{mm0}.txt','w')
 
@@ -148,3 +159,6 @@ for i in range(len(lons_end)):
 outFile.close()
 
 
+#o.plot()
+
+#o.animation()
