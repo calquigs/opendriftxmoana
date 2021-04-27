@@ -20,7 +20,7 @@ Everytime you want to work on the project, you need to *activate* it before:
 ```
 conda activate opendrift_simon
 ```
-You should see `(opendrift)` prepended to your command line prompt as a hint that it is now activated.
+You should see `(opendrift_simon)` prepended to your command line prompt as a hint that it is now activated.
 
 To deactivate the environment, type
 ```
