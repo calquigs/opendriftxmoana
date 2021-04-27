@@ -12,15 +12,15 @@ After installing miniconda, you need to install [OpenDrift (forked version)](htt
 git clone https://github.com/simonweppe/opendrift
 cd opendrift
 conda env create -f environment.yml
-conda activate opendrift
+conda activate opendrift_simon
 pip install -e .
 ```
 
 Everytime you want to work on the project, you need to *activate* it before: 
 ```
-conda activate opendrift
+conda activate opendrift_simon
 ```
-You should see `(opendrift)` prepended to your command line prompt as a hint that it is now activated.
+You should see `(opendrift_simon)` prepended to your command line prompt as a hint that it is now activated.
 
 To deactivate the environment, type
 ```
