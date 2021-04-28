@@ -121,7 +121,7 @@ o.set_config('drift:advection_scheme','runge-kutta4')
 o.set_config('drift:current_uncertainty', 0.0)
 o.set_config('drift:max_age_seconds', 3600*24*35)
 o.set_config('drift:min_settlement_age_seconds', 3600*24*21)
-o.set_config('drift:lift_to_seafloor',True)
+o.set_config('general:seafloor_action', 'lift_to_seafloor')
 o.set_config('drift:vertical_mixing', False)
 o.set_config('general:coastline_action','previous')
 
