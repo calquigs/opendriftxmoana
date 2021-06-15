@@ -130,7 +130,8 @@ o.run(stop_on_error=False,
       end_time=reader2.end_time,
       time_step=900, 
       time_step_output = 86400.0,
-      export_variables = [])
+      export_variables = [],
+      file_name = )
 
 index_of_first, index_of_last = o.index_of_activation_and_deactivation()
 lons = o.get_property('lon')[0]
@@ -146,5 +147,7 @@ for i in range(len(lons_end)):
   outFile.write(str(lons_start[i])+","+str(lats_start[i])+","+str(lons_end[i])+","+str(lats_end[i])+","+str(status_end[i])+"\n")
 
 outFile.close()
+
+o.animation
 
 

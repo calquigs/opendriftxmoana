@@ -196,7 +196,7 @@ def plot_pdd(sfpoints):
     m.drawcoastlines()
     m.fillcontinents(color='white')
     xs, ys = m(lon_bins_2d, lat_bins_2d)
-    plt.pcolormesh(xs, ys, H, cmap = 'inferno')
+    plt.pcolormesh(xs, ys, H, cmap = 'jet')
     #plt.show()
 
 
