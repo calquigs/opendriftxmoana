@@ -18,6 +18,8 @@ import pandas as pd
 from mpl_toolkits.basemap import Basemap
 import random
 from scipy import stats
+from scipy.signal import convolve2d
+
 
 txt_in = sys.argv[1]
 print(txt_in)
