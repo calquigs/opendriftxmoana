@@ -1,15 +1,15 @@
 #!/bin/bash -e
 
 #SBATCH --account=vuw03073                      #Type the project code you want to use for this analyis		 $
-#SBATCH --job-name=variability_reinga          #This willl be the name appear on the queue			 $
+#SBATCH --job-name=TAS          #This willl be the name appear on the queue			 $
 #SBATCH --mem=20G                               #Amount of memory you need                                       $
 #SBATCH --cpus-per-task=2                       #Amount of CPUs (logical)                                        $
 #SBATCH --time=02-00:00:00                         #Duration dd-hh:mm:ss                                            $
-#SBATCH --output=/nesi/project/vuw03073/testScripts/slurmOut/variability_reinga_%a.%j.txt    #Name of the output file                                 $
+#SBATCH --output=/nesi/project/vuw03073/testScripts/slurmOut/TAS_%a.%j.txt    #Name of the output file                                 $
 #SBATCH --mail-type=ALL                         #This will send you an email when the STARTS and ENDS		 $
 #SBATCH --mail-user=calquigs@gmail.com          #Enter your email address.                                       $
 #SBATCH --profile=task
-#SBATCH --array=0-1                     # Array jobs
+#SBATCH --array=0-2                     # Array jobs
 
 #SBATCH --export NONE
 
@@ -24,10 +24,10 @@ source activate opendrift_simon
 
 #Set variables
 inPath='/nesi/nobackup/mocean02574/NZB_N50/'
-outPath='/nesi/project/vuw03073/testScripts/OPO/'
-name='OPO_' 
-lon=173.25
-lat=-35.55
+outPath='/nesi/project/vuw03073/testScripts/TAS/'
+name='TAS' 
+lon=173.1
+lat=-41.2
 
 #Create array of yyyymm
 months=(01 02 03 04 05 06 07 08 09 10 11 12)
@@ -44,6 +44,6 @@ done
 
 
 #run jobs
-python /nesi/project/vuw03073/opendriftxmoana/scripts/moana_master.py -i inPath -o outPath -n name -ym ym[$SLURM_ARRAY_TASK_ID] -lon lon -lat lat
+python -m cProfile -o output.pstats /nesi/project/vuw03073/opendriftxmoana/scripts/moana_master.py -i $inPath -o $outPath -n $name -ym ${ym[$SLURM_ARRAY_TASK_ID]} -lon $lon -lat $lat
 
 
