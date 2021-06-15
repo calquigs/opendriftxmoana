@@ -15,6 +15,7 @@ import shapefile
 import seaborn as sns
 import pandas as pd
 from mpl_toolkits.basemap import Basemap
+import glob
 
 ######################
 #extract data from .nc
@@ -69,8 +70,12 @@ def customout_to_startfinal_points(txt_in):
     for line in inFile:
         line = line.strip()
         elems = line.split(',')
-        sfpoints.append([Point(float(elems[0]), float(elems[1])), Point(float(elems[2]), float(elems[3])), int(elems[4])])
+        sfpoints.append([Point(float(elems[0]), float(elems[1])), Point(float(elems[2]), float(elems[3])), elems[4]])
     return sfpoints
+
+allpoints = []
+for file in glob.glob('OPO/*'):
+    allpoints.append(customout_to_startfinal_points(file))
 
 
 ########################################
@@ -81,11 +86,88 @@ shp = shapefile.Reader(shape_filename)
 bins = shp.shapes()
 records = shp.records()
 
-pts = bins[0].points
-pts = [list(elem) for elem in pts]
-poly = Polygon(pts)
-point = Point(lon,lat)
-poly.contain(point)
+class Grid2:
+    def __init__(self, lons, lats, bb):
+        #create empty grid
+        self.min_lon = lons[0]
+        self.max_lon = lons[1]
+        self.min_lat = lats[1]
+        self.max_lat = lats[0]
+        self.cell_size = .1
+        self.nlon = round((self.max_lon - self.min_lon) / self.cell_size)
+        self.nlat = round((self.max_lat - self.min_lat) / self.cell_size)
+        print(f'grid size: ({self.nlon}, {self.nlat})')
+        self.bin_idx = np.full((self.nlon, self.nlat), -1, dtype='int')
+        #read mask from backbone
+        mask = bb.variables['mask_rho'][:]
+        lon_rho = bb.variables['lon_rho'][:]
+        lat_rho = bb.variables['lat_rho'][:]
+        #fill grid with mask
+        for row in range(len(mask)):
+            for column in range(len(mask[row,:])):
+                if mask[row, column] == 0:
+                    lon_idx = self.lon_to_grid_col(lon_rho[row, column])
+                    lat_idx = self.lat_to_grid_row(lat_rho[row, column])
+                    self.bin_idx[lon_idx, lat_idx] = 0
+        #find adjacent bins
+        kernel = [[0,1,0],[1,0,1],[0,1,0]]
+        counts = convolve2d(self.bin_idx, kernel, mode='same', 
+                    boundary='fill', fillvalue=-1)
+        i = 1
+        for row in range(len(self.bin_idx)):
+            for column in range(len(self.bin_idx[row,:])):
+                if counts[row, column] != -4 and self.bin_idx[row, column] == -1:
+                    self.bin_idx[row, column] = i
+                    i += 1
+    def lon_to_grid_col(self, lon):
+        if lon < 0:
+            lon += 360
+        if lon < self.min_lon:
+            lon = self.min_lon
+        if lon >= self.max_lon:
+            lon = self.max_lon - .01
+        return math.floor(round((lon - self.min_lon) / self.cell_size, 6))
+    def lat_to_grid_row(self, lat):
+        if lat < self.min_lat:
+            lat = self.min_lat
+        if lat >= self.max_lat:
+            lat = self.max_lat - .01
+        return math.floor(round((lat - self.min_lat) / self.cell_size, 6))
+    def get_bin_idx(self, lon, lat):
+        lon_idx = self.lon_to_grid_col(lon)
+        lat_idx = self.lat_to_grid_row(lat)
+        return self.bin_idx[lon_idx, lat_idx]
+    def bin_corners(self, lon, lat):
+        llon = self.min_lon + self.cell_size*self.lon_to_grid_col(lon)
+        rlon = self.min_lon + self.cell_size*(self.lon_to_grid_col(lon)+1)
+        blat = self.min_lat + self.cell_size*self.lat_to_grid_row(lat)
+        tlat = self.min_lat + self.cell_size*(self.lat_to_grid_row(lat)+1)
+        return [llon, rlon, blat, tlat]
+
+grid = Grid2([164, 184], [-52, -31], bb)
+
+########
+#plot grid as bins
+########
+for col in range(grid.nlon):
+    for row in range(grid.nlat):
+        if grid.bin_idx[col, row] > 0:
+            xs = [grid.min_lon, grid.max_lon, grid.max_lon, grid.min_lon]
+            ys = [grid.max_lat, grid.max_lat, grid.min_lat, grid.min_lat]
+            plt.plot(xs,ys)
+
+
+def write_shape(site):
+    llon = grid.bin_corners(site[0],site[1])[0]
+    rlon = grid.bin_corners(site[0],site[1])[1]
+    blat = grid.bin_corners(site[0],site[1])[2]
+    tlat = grid.bin_corners(site[0],site[1])[3]
+    w.poly([[[llon, tlat], [rlon, tlat], [rlon, blat], [llon, blat]]])
+    w.record('oops', round(site[0],1), round(site[1],1))
+
+
+
+
 class Grid:
     def __init__(self, bins, records):
         self.bins = bins
@@ -113,12 +195,12 @@ class Grid:
             lat_idx = self.lat_to_grid_row(min([p[1] for p in b.points[:]]))
             self.bin_idx[lon_idx, lat_idx] = i
         # assign region to each grid cell
-        self.bin_regions = np.full((self.nlon, self.nlat), -1, dtype='int')
-        for i in range(len(self.bins)):
-            b = self.bins[i]
-            lon_idx = self.lon_to_grid_col(min([p[0] for p in b.points[:]]))
-            lat_idx = self.lat_to_grid_row(min([p[1] for p in b.points[:]]))
-            self.bin_regions[lon_idx, lat_idx] = records[i][6]-1
+        #self.bin_regions = np.full((self.nlon, self.nlat), -1, dtype='int')
+        #for i in range(len(self.bins)):
+        #    b = self.bins[i]
+        #    lon_idx = self.lon_to_grid_col(min([p[0] for p in b.points[:]]))
+        #    lat_idx = self.lat_to_grid_row(min([p[1] for p in b.points[:]]))
+        #    self.bin_regions[lon_idx, lat_idx] = records[i][6]-1
     def lon_to_grid_col(self, lon):
         if lon < 0:
             lon += 360
@@ -203,19 +285,22 @@ def points_to_binmatrix(matrix, sfpoints):
     for x in sfpoints:
         sfbins = []
         for i in range(len(x)):
-            start_bin_idx = grid.get_bin_idx(x[i][0].x, x[i][0].y)
-            final_bin_idx = grid.get_bin_idx(x[i][1].x, x[i][1].y)
+            start_bin_idx = grid.get_bin_idx(x[i][0].x, x[i][0].y) +1
+            final_bin_idx = grid.get_bin_idx(x[i][1].x, x[i][1].y) +1
             sfbins.append([start_bin_idx, final_bin_idx])
+        #print(len(sfbins))
         for i in sfbins:
-            if i[0] > 0:
+            if i[0] != 0:
                 if i[1] == -1:
-                    matrix[i[0], -1] += 1
+                    matrix[i[0]-1, -1] += 1
                 else:
-                    matrix[i[0], i[1]] += 1
-    for i in range(len(matrix)-1):
-        if sum(matrix[i]) > 0:
-            matrix[i] = matrix[i]/sum(matrix[i])
-    matrix = matrix[:,:-1]
+                    matrix[i[0]-1, i[1]-1] += 1
+        #print(len(matrix))
+    #for i in range(len(matrix)):
+    #    #print(i)
+    #    if sum(matrix[i]) > 0:
+    #        matrix[i] = matrix[i]/sum(matrix[i])
+    #matrix = matrix[:,:-1]
     return matrix
 
 
@@ -258,7 +343,7 @@ ax = sns.heatmap(df, mask = (df == 0))
 ############
 #plot points
 ############
-def plot_sfpoints(sfpoints):
+def plot_sfpoints(sfpoints, num):
     '''
     Plot start and final position of each particle.
 
@@ -273,14 +358,16 @@ def plot_sfpoints(sfpoints):
             fx = i[1].x
             fy = i[1].y
             plt.plot(sx, sy, 'go')
-            if i[2] == 0:
+            if i[2] == 'seeded_on_land':
                 plt.plot(fx, fy, 'bo')
-            if i[2] == 1:
+            if i[2] == 'outside':
                 plt.plot(fx, fy, 'yo')
-            if i[2] == 'settled_on_coast':
+            if i[2] == 'active':
                 plt.plot(fx, fy, 'ro')
-            if i[2] == 'settled_on_bottom':
+            if i[2] == 'home_sweet_home':
                 plt.plot(fx, fy, 'mo')
+            if i[2] == 'died':
+                plt.plot(fx, fy, 'ko') 
     m = Basemap(resolution= 'h', llcrnrlon = 162, llcrnrlat = -51, urcrnrlon = 186, urcrnrlat = -32)
     m.drawcoastlines()
     plt.show()
@@ -290,18 +377,45 @@ def plot_sfpoints(sfpoints):
 #############
 #just for fun
 #############
+#get only 14 sites
+just14 = outmat[:, [30, 80, 81, 157, 173, 187, 199, 235, 247, 249, 271, 316, 432, 442]]
+just14 = just14[[30, 80, 81, 157, 173, 187, 199, 235, 247, 249, 271, 316, 432, 442], :]
+
+site_order = [8, 12, 13, 5, 6, 7, 4, 11, 10, 9, 3, 2, 1, 0]
+just14_order = just14[site_order]
+just14_order = just14_order[:,site_order]
+site_labs = ['FIO', 'BGB', 'HSB', 'TIM', 'LWR', 'WEST', 'FLE', 'TAS', 'OPO', 'GOB', 'KAI', 'CAM', 'MAU', 'CAP']
+site_labs = np.asarray(site_labs)
+site_labs = site_labs[site_order]
+df = pd.DataFrame(data = just14_order, index = site_labs, columns = site_labs)
+num=61488
+df_pct=df/num
+df_log=np.log10(df_pct)
+df_log[np.isneginf(df_log)] = -4.7
+
+ax = sns.heatmap(df_log, cbar_kws={'label': 'log10(% migrants)'})
+ax.invert_xaxis()
+#ax.set_xlabel("Destination Population")
+#ax.set_ylabel("Source Population")
+#ax.set(xlabel='common xlabel', ylabel='common ylabel')
+plt.xlabel("Destination Population")
+plt.ylabel("Source Population")
+plt.tight_layout()
+plt.show()
+
+
 #exclude empty rows
 nonemptyr = 0
-for i in matrix:
+for i in outmat:
     if sum(i) > 0:
         nonemptyr += 1
 
-matrixr = np.empty((nonemptyr, len(bins)))
+matrixr = np.empty((nonemptyr, 532))
 
 count = 0
-for i in range(len(matrix)):
-    if sum(matrix[i] > 0):
-        matrixr[count] = matrix[i]
+for i in range(len(outmat)):
+    if sum(outmat[i] > 0):
+        matrixr[count] = outmat[i]
         count += 1
 
 #exclude empty columns

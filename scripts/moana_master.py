@@ -130,7 +130,7 @@ o.set_config('drift:advection_scheme','runge-kutta4')
 o.set_config('drift:current_uncertainty', 0.0)
 o.set_config('drift:max_age_seconds', 3600*24*35)
 o.set_config('drift:min_settlement_age_seconds', 3600*24*21)
-o.set_config('drift:lift_to_seafloor',True)
+o.set_config('general:seafloor_action', 'lift_to_seafloor')
 o.set_config('drift:vertical_mixing', False)
 o.set_config('general:coastline_action','previous')
 o.set_config('drift:settlement_in_habitat', True)
@@ -150,7 +150,8 @@ o.run(stop_on_error=False,
       end_time=reader2.end_time,
       time_step=3600, 
       time_step_output = 86400.0,
-      export_variables = [])
+      export_variables = [],
+      file_name = )
 
 index_of_first, index_of_last = o.index_of_activation_and_deactivation()
 lons = o.get_property('lon')[0]
@@ -167,6 +168,8 @@ for i in range(len(lons_end)):
   outFile.write(str(lons_start[i])+","+str(lats_start[i])+","+str(lons_end[i])+","+str(lats_end[i])+","+str(o.status_categories[status_end[i]])+"\n")
 
 outFile.close()
+
+o.animation
 
 
 #o.plot(f'{args.name}.jpg')
