@@ -44,9 +44,9 @@ path0 = args.input + 'nz5km_his_' + yyyy0 + mm0 + '.nc'
 path1 = args.input + 'nz5km_his_' + yyyy1 + mm1 + '.nc'
 path2 = args.input + 'nz5km_his_' + yyyy2 + mm2 + '.nc'
 
-print(path0)
-print(path1)
-print(path2)
+#print(path0)
+#print(path1)
+#print(path2)
 
 
 reader0 = reader_ROMS_native_MOANA.Reader(path0)
@@ -72,11 +72,14 @@ o.add_reader([reader0, reader1, reader2])
 ullon = args.upperleftlon 
 ullat = args.upperleftlat
 
-lons = [ullon, ullon+.05, ullon+.05, ullon]
-lats = [ullat, ullat, ullat-.05, ullat-.05]
+#lons = [ullon, ullon+.1, ullon+.1, ullon]
+#lats = [ullat, ullat, ullat-.1, ullat-.1]
+lon = ullon+.05
+lat = ullat-.05
 
-print(lons)
-print(lats)
+
+#print(lons)
+#print(lats)
 
 def create_seed_times(start, end, delta):
   """
@@ -91,14 +94,20 @@ def create_seed_times(start, end, delta):
   return out
 
 times = create_seed_times(reader0.start_time, 
-                          reader0.end_time, timedelta(hours = 2))
+                          reader0.end_time, timedelta(hours = 1))
 
 
-number = 55
+number = 7
 z = np.random.uniform(-10,0,size=len(times)) # generate random depth
 
 for i in range(len(times)):
-  o.seed_within_polygon(lons, lats, number = number, time = times[i], z = z[i])
+  o.seed_elements(lon, lat, number = number, radius=2500, radius_type='uniform',time = times[i], z = z[i])
+
+
+###########
+#Load habitat
+###########
+shp, bins = o.habitat('./14shapes/14shapes.shp') # Location of the shapefile with the habit$
 
 
 ###############################
@@ -124,6 +133,7 @@ o.set_config('drift:min_settlement_age_seconds', 3600*24*21)
 o.set_config('drift:lift_to_seafloor',True)
 o.set_config('drift:vertical_mixing', False)
 o.set_config('general:coastline_action','previous')
+o.set_config('drift:settlement_in_habitat', True)
 
 o.list_config()
 
@@ -134,11 +144,11 @@ o.list_config()
 lons_start = o.elements_scheduled.lon
 lats_start = o.elements_scheduled.lat
 
-o.plot()
+#o.plot()
 
 o.run(stop_on_error=False,
       end_time=reader2.end_time,
-      time_step=900, 
+      time_step=3600, 
       time_step_output = 86400.0,
       export_variables = [])
 
@@ -154,11 +164,11 @@ print(o.status_categories)
 outFile = open(f'{args.output}{args.name}_{yyyy0}{mm0}.txt','w')
 
 for i in range(len(lons_end)):
-  outFile.write(str(lons_start[i])+","+str(lats_start[i])+","+str(lons_end[i])+","+str(lats_end[i])+","+str(status_end[i])+"\n")
+  outFile.write(str(lons_start[i])+","+str(lats_start[i])+","+str(lons_end[i])+","+str(lats_end[i])+","+str(o.status_categories[status_end[i]])+"\n")
 
 outFile.close()
 
 
-#o.plot()
+#o.plot(f'{args.name}.jpg')
 
-#o.animation()
+#o.animation(f'{args.name}.mp4')

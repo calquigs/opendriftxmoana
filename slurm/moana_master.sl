@@ -1,15 +1,15 @@
 #!/bin/bash -e
 
 #SBATCH --account=vuw03073                      #Type the project code you want to use for this analyis		 $
-#SBATCH --job-name=TAS          #This willl be the name appear on the queue			 $
-#SBATCH --mem=20G                               #Amount of memory you need                                       $
+#SBATCH --job-name=GOB5k          #This willl be the name appear on the queue			 $
+#SBATCH --mem=10G                               #Amount of memory you need                                       $
 #SBATCH --cpus-per-task=2                       #Amount of CPUs (logical)                                        $
-#SBATCH --time=02-00:00:00                         #Duration dd-hh:mm:ss                                            $
-#SBATCH --output=/nesi/project/vuw03073/testScripts/slurmOut/TAS_%a.%j.txt    #Name of the output file                                 $
+#SBATCH --time=04:00:00                         #Duration dd-hh:mm:ss                                            $
+#SBATCH --output=/nesi/project/vuw03073/testScripts/slurmOut/GOB5k_%a.%j.txt    #Name of the output file                                 $
 #SBATCH --mail-type=ALL                         #This will send you an email when the STARTS and ENDS		 $
 #SBATCH --mail-user=calquigs@gmail.com          #Enter your email address.                                       $
 #SBATCH --profile=task
-#SBATCH --array=0-2                     # Array jobs
+#SBATCH --array=0-1                     # Array jobs
 
 #SBATCH --export NONE
 
@@ -24,14 +24,15 @@ source activate opendrift_simon
 
 #Set variables
 inPath='/nesi/nobackup/mocean02574/NZB_N50/'
-outPath='/nesi/project/vuw03073/testScripts/TAS/'
-name='TAS' 
-lon=173.1
-lat=-41.2
+outPath='/nesi/project/vuw03073/testScripts/'
+name='GOB_5k' 
+lon=173.3
+lat=-42.9
 
 #Create array of yyyymm
 months=(01 02 03 04 05 06 07 08 09 10 11 12)
-years=($(seq 1994 2016))
+#years=($(seq 1994 2016))
+years=(2016)
 declare -a ym
 
 for i in "${months[@]}"
@@ -44,6 +45,6 @@ done
 
 
 #run jobs
-python -m cProfile -o output.pstats /nesi/project/vuw03073/opendriftxmoana/scripts/moana_master.py -i $inPath -o $outPath -n $name -ym ${ym[$SLURM_ARRAY_TASK_ID]} -lon $lon -lat $lat
+python /nesi/project/vuw03073/opendriftxmoana/scripts/moana_master.py -i $inPath -o $outPath -n $name -ym ${ym[$SLURM_ARRAY_TASK_ID]} -lon $lon -lat $lat
 
 
