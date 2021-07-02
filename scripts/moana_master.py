@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib
 from datetime import datetime, timedelta
 from opendrift.readers import reader_ROMS_native_MOANA
-from opendrift.models.bivalvelarvae import BivalveLarvae
+from opendrift.models.bivalvelarvae2 import BivalveLarvae
 
 ###############################
 #Parse arguments
@@ -62,7 +62,7 @@ reader2.multiprocessing_fail = True
 #Create Simulation Object
 ###############################
 
-o = BivalveLarvae(loglevel=0)
+o = BivalveLarvae(loglevel=30)
 o.add_reader([reader0, reader1, reader2])
 
 ###############################
@@ -97,7 +97,7 @@ times = create_seed_times(reader0.start_time,
                           reader0.end_time, timedelta(hours = 1))
 
 
-number = 7
+number = 11
 z = np.random.uniform(-10,0,size=len(times)) # generate random depth
 
 for i in range(len(times)):
@@ -149,9 +149,8 @@ lats_start = o.elements_scheduled.lat
 o.run(stop_on_error=False,
       end_time=reader2.end_time,
       time_step=3600, 
-      time_step_output = 86400.0,
-      export_variables = [],
-      file_name = )
+      time_step_output = 3600.0,
+      export_variables = [])
 
 index_of_first, index_of_last = o.index_of_activation_and_deactivation()
 lons = o.get_property('lon')[0]
@@ -169,9 +168,6 @@ for i in range(len(lons_end)):
 
 outFile.close()
 
-o.animation
+#o.plot(filename=f'{args.name}_{yyyy0}{mm0}.jpg')
 
-
-#o.plot(f'{args.name}.jpg')
-
-#o.animation(f'{args.name}.mp4')
+#o.animation(filename=f'{args.name}_{yyyy0}{mm0}.mp4')

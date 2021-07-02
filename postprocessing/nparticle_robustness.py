@@ -402,8 +402,8 @@ fuv_data0 = fuv_data(sfpoints, ns, 100)
 #outFile.write(fuv_data0)
 #outFile.close()
 outFile = open(f'reinga_fuv_grid2/reinga_fuv_{txt_in[-10:-4]}.txt', 'w')
-for row in fuv_data0:
-    np.savetxt(outFile, row)
+#for row in fuv_data0:
+np.savetxt(outFile, fuv_data0)
 
 outFile.close()
 
