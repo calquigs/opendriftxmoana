@@ -16,6 +16,7 @@ import seaborn as sns
 import pandas as pd
 from mpl_toolkits.basemap import Basemap
 import glob
+from scipy.signal import convolve2d
 
 ######################
 #extract data from .nc
@@ -85,6 +86,7 @@ shape_filename = "rho_settlement_bins/rho_settlement_bins.shp"
 shp = shapefile.Reader(shape_filename)
 bins = shp.shapes()
 records = shp.records()
+bb = nc.Dataset('/nesi/nobackup/mocean02574/NZB_N50/nz5km_his_200404.nc')
 
 class Grid2:
     def __init__(self, lons, lats, bb):
@@ -144,7 +146,7 @@ class Grid2:
         tlat = self.min_lat + self.cell_size*(self.lat_to_grid_row(lat)+1)
         return [llon, rlon, blat, tlat]
 
-grid = Grid2([164, 184], [-52, -31], bb)
+grid = Grid2([164, 184], [-31, -52], bb)
 
 ########
 #plot grid as bins
@@ -152,9 +154,15 @@ grid = Grid2([164, 184], [-52, -31], bb)
 for col in range(grid.nlon):
     for row in range(grid.nlat):
         if grid.bin_idx[col, row] > 0:
-            xs = [grid.min_lon, grid.max_lon, grid.max_lon, grid.min_lon]
-            ys = [grid.max_lat, grid.max_lat, grid.min_lat, grid.min_lat]
-            plt.plot(xs,ys)
+            cell_minlon = grid.min_lon+(col)*grid.cell_size
+            cell_maxlon = grid.min_lon+(col+1)*grid.cell_size
+            cell_maxlat = grid.min_lat+(row+1)*grid.cell_size
+            cell_minlat = grid.min_lat+(row)*grid.cell_size
+            xs = [cell_minlon, cell_maxlon, cell_maxlon, cell_minlon, cell_minlon]
+            ys = [cell_maxlat, cell_maxlat, cell_minlat, cell_minlat, cell_maxlat]
+            plt.plot(xs,ys, 'k')
+            grid_id = grid.get_bin_idx(((cell_maxlon+cell_minlon)/2), ((cell_maxlat+cell_minlat)/2))
+            plt.annotate(str(grid_id), (((cell_maxlon+cell_minlon)/2), ((cell_maxlat+cell_minlat)/2)), ha='center', va='center')
 
 
 def write_shape(site):
@@ -404,11 +412,23 @@ plt.tight_layout()
 plt.show()
 
 
+#############
+#plot reef
+#############
+sf = shp.Reader("NZ_rocky_reef.shp")
+for shape in sf.shapeRecords():
+    x = [i[0] for i in shape.shape.points[:]]
+    y = [i[1] for i in shape.shape.points[:]]
+    plt.plot(x,y)
+
+
 #exclude empty rows
 nonemptyr = 0
 for i in outmat:
     if sum(i) > 0:
         nonemptyr += 1
+
+reefless_bins = [49, 102, 116, 118, 120, 122, 130, 132, 134, 139, 143, 145, 166, 174, 200, 201, 217, 227, 208, 207, 215, 216, 235, 236, 391, 390, 389, 384, 383, 336, 337, 341, 342, 343, 328, 287, 281, 275, 268, 269, 220, 474, 472, 471, 473, 475, 477, 479, 192, 188, 186, 176, 167, 165, 163, 151, 150, 149, 147]
 
 matrixr = np.empty((nonemptyr, 532))
 
