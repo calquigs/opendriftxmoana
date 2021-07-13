@@ -89,10 +89,11 @@ class Grid2:
 
 grid = Grid2([164, 184], [-31, -52], bb)
 
-outFile = open(f'final_bins/{sys.argv[1][:-4]}_finalbins.txt')
-sfpoints = customout_to_startfinal_points(sys.argv[1])
-for pt in sfpoints:
-	if pt[1]>0:
-		outFile.write(pt[1])
-outFile.close()
+for file in glob.glob('bigboy/*.txt'):
+    outFile = open(f'final_bins/{file[:-4]}_finalbins.txt')
+    sfpoints = customout_to_startfinal_points(file)
+    for pt in sfpoints:
+    	if pt[1]>0:
+    		outFile.write(pt[1])
+    outFile.close()
 
