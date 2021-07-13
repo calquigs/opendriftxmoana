@@ -93,7 +93,7 @@ for file in glob.glob('bigboy/*.txt'):
     outFile = open(f'final_bins/{file[:-4]}_finalbins.txt')
     sfpoints = customout_to_startfinal_points(file)
     for pt in sfpoints:
-    	if pt[1]>0:
-    		outFile.write(pt[1])
-    outFile.close()
+    	if grid.get_bin_idx(pt[1].x, pt[1].y)>0:
+                outFile.write(str(grid.get_bin_idx(pt[1].x, pt[1].y))+'\n')
+outFile.close()
 
