@@ -25,14 +25,11 @@ source activate opendrift_simon
 #Set variables
 inPath='/nesi/nobackup/mocean02574/NZB_3/'
 outPath='/nesi/project/vuw03073/testScripts/LWRtest/'
-names=('LWR')
-lons=(171.9)
-lats=(-41.3)
 
-#14pops
-#names=('OPO' 'MAU' 'CAP' 'WEST' 'FLE' 'TAS' 'CAM' 'LWR' 'KAI' 'GOB' 'TIM' 'FIO' 'HSB' 'BGB')
-#lons=(173.2 176.0 176.3 172.4 172.7 173.1 174.3 171.9 173.7 173.3 171.3 166.8 168.2 168.2)
-#lats=(-35.5 -37.4 -40.9 -40.5 -40.6 -41.1 -41.7 -41.3 -42.4 -42.9 -44.4 -45.1 -46.8 -46.9)
+14pops
+names=('OPO' 'MAU' 'CAP' 'WEST' 'FLE' 'TAS' 'CAM' 'LWR' 'KAI' 'GOB' 'TIM' 'FIO' 'HSB' 'BGB')
+lons=(173.2 176.0 176.3 172.4 172.7 173.1 174.3 171.9 173.7 173.3 171.3 166.8 168.2 168.2)
+lats=(-35.5 -37.4 -40.9 -40.5 -40.5 -41.1 -41.7 -41.3 -42.4 -42.9 -44.4 -45.1 -46.8 -46.9)
 
 #19pops
 #names=('HOU' 'OPO' 'PAK' 'TEK' 'MAU' 'CAP' 'KAT' 'POG' 'GOL' 'TAS' 'LWR' 'NMC' 'GOB' 'JAB' 'TIM' 'FIO' 'RIV' 'HSB' 'BGB')
