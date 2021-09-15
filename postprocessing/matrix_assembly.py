@@ -117,36 +117,30 @@ def points_to_binmatrix(matrix, sfpoints):
 
 
 
-cells = len(np.where(grid.bid_idx>=0)[0])
+cells = len(np.where(grid.bin_idx>=0)[0])
 
 mat0 = np.empty((cells, cells+1))
 
 sfpoints = [] 
 
-for file in glob.glob('bigboy_test/*'):
-	sfpoints.append(customout_to_startfinal_points(file))
+all = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+#summer = ['05', '06', '07', '08', '09', '10']
+#winter = ['11', '12', '01', '02', '03', '04']
+
+winter = ['01', '02', '03']
+spring = ['04', '05', '06']
+summer = ['07', '08', '09']
+fall = ['10', '11', '12']
+
+for month in all:
+	for file in glob.glob(f'bigboy22/*{month}.txt'):
+		sfpoints.append(customout_to_startfinal_points(file))
 
 
 mat1 = points_to_binmatrix(mat0, sfpoints)
 
-num=np.sum(mat1[30])
-just14 = mat1[:, [30, 80, 81, 157, 173, 187, 199, 235, 247, 249, 271, 316, 432, 442]]
-just14 = just14[[30, 80, 81, 157, 173, 187, 199, 235, 247, 249, 271, 316, 432, 442], :]
 
-site_order = [8, 12, 13, 5, 6, 7, 4, 11, 10, 9, 3, 2, 1, 0]
-just14_order = just14[site_order]
-just14_order = just14_order[:,site_order]
-site_labs = ['FIO', 'BGB', 'HSB', 'TIM', 'LWR', 'WEST', 'FLE', 'TAS', 'OPO', 'GOB', 'KAI', 'CAM', 'MAU', 'CAP']
-site_labs = np.asarray(site_labs)
-site_labs = site_labs[site_order]
-df = pd.DataFrame(data = just14_order, index = site_labs, columns = site_labs)
-df_pct=df/num
-df_log=np.log10(df_pct)
-df_log[np.isneginf(df_log)] = -5
-
-
-
-outFile = open('bigboy_out.txt', 'w')
+outFile = open('bigboy22.txt', 'w')
 np.savetxt(outFile, mat1)
 outFile.close()
 

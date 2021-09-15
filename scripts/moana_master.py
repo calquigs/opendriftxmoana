@@ -107,7 +107,7 @@ for i in range(len(times)):
 ###########
 #Load habitat
 ###########
-shp, bins = o.habitat('./14shapes/14shapes.shp') # Location of the shapefile with the habit$
+shp, bins = o.habitat('./22shapes/22shapes.shp') # Location of the shapefile with the habit$
 
 
 ###############################
@@ -128,8 +128,8 @@ o.set_config('environment:fallback:ocean_vertical_diffusivity', Kz)
 o.set_config('seed:ocean_only',True)
 o.set_config('drift:advection_scheme','runge-kutta4')
 o.set_config('drift:current_uncertainty', 0.0)
-o.set_config('drift:max_age_seconds', 3600*24*35)
-o.set_config('drift:min_settlement_age_seconds', 3600*24*21)
+o.set_config('drift:max_age_seconds', 3600*24*9)
+o.set_config('drift:min_settlement_age_seconds', 3600*24*5)
 o.set_config('general:seafloor_action', 'lift_to_seafloor')
 o.set_config('drift:vertical_mixing', False)
 o.set_config('general:coastline_action','previous')
@@ -150,7 +150,8 @@ o.run(stop_on_error=False,
       end_time=reader2.end_time,
       time_step=3600, 
       time_step_output = 3600.0,
-      export_variables = [])
+      export_variables = [],
+      outfile = f'{args.output}{args.name}_{yyyy0}{mm0}_5_to_9days.nc')
 
 index_of_first, index_of_last = o.index_of_activation_and_deactivation()
 lons = o.get_property('lon')[0]
@@ -161,12 +162,12 @@ lats_end = lats[index_of_last, range(lons.shape[1])]
 status_end = status[index_of_last, range(lons.shape[1])]
 print(o.status_categories)
 
-outFile = open(f'{args.output}{args.name}_{yyyy0}{mm0}.txt','w')
-
-for i in range(len(lons_end)):
-  outFile.write(str(lons_start[i])+","+str(lats_start[i])+","+str(lons_end[i])+","+str(lats_end[i])+","+str(o.status_categories[status_end[i]])+"\n")
-
-outFile.close()
+#outFile = open(f'{args.output}{args.name}_{yyyy0}{mm0}.txt','w')
+#
+#for i in range(len(lons_end)):
+#  outFile.write(str(lons_start[i])+","+str(lats_start[i])+","+str(lons_end[i])+","+str(lats_end[i])+","+str(o.status_categories[status_end[i]])+"\n")
+#
+#outFile.close()
 
 #o.plot(filename=f'{args.name}_{yyyy0}{mm0}.jpg')
 
