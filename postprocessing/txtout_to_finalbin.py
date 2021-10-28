@@ -90,7 +90,7 @@ class Grid2:
 grid = Grid2([164, 184], [-31, -52], bb)
 
 for file in glob.glob('bigboy/*.txt'):
-    outFile = open(f'final_bins/{file[:-4]}_finalbins.txt')
+    outFile = open(f'bigboy/final_bins/{file[6:-4]}_finalbins.txt','w')
     sfpoints = customout_to_startfinal_points(file)
     for pt in sfpoints:
     	if grid.get_bin_idx(pt[1].x, pt[1].y)>0:

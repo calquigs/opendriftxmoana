@@ -27,7 +27,52 @@ def customout_to_startfinal_points(txt_in):
         sfpoints.append([Point(float(elems[0]), float(elems[1])), Point(float(elems[2]), float(elems[3])), elems[4]])
     return sfpoints
 
-bb = nc.Dataset('/nesi/nobackup/mocean02574/NZB_3/nz5km_his_199601.nc')
+
+def nc_to_startfinal_points(nc_in):
+    '''
+    Extract the start and final locations as shapely Points and end status 
+    of each particle from an OpenDrift output .nc file.
+
+    nc_in: the path to the .nc file
+    '''
+    #open file+extract variables
+    traj = nc.Dataset(nc_in)
+    lon = traj["lon"][:]
+    lat = traj["lat"][:]
+    status = traj["status"][:]
+    
+    finaltimes = [np.where(part > 0)[-1] for part in status]
+    finaltimes = [t.item() if len(t) else -1 for t in finaltimes]
+    #extract start lon, lat for each particle (first nonmasked value)
+    startlon = [part.compressed()[0] for part in lon]
+    startlat = [part.compressed()[0] for part in lat]
+    #extract final lon,lat, and status for each particle
+    finallon = []
+    finallat = []
+    finalstatus = []
+    count = 0
+    for final in finaltimes:
+        finallon.append(lon[count, final])
+        finallat.append(lat[count, final])
+        finalstatus.append(status[count, final])
+        count += 1
+    #convert status flags to meanings
+    statusmeanings = traj.variables['status'].flag_meanings
+    statusmeanings = statusmeanings.split()
+    finalstatus = [statusmeanings[finalstatus[i]] for i in range(len(finalstatus))]
+    #convert start/final lon,lat to points
+    startpoints = []
+    for i in range(len(startlon)):
+        startpoints.append(Point(startlon[i], startlat[i]))
+    finalpoints = []
+    for i in range(len(finallon)):
+        finalpoints.append(Point(finallon[i], finallat[i]))
+    sfpoints = []
+    for i in range(len(startpoints)):
+        sfpoints.append([startpoints[i], finalpoints[i], finalstatus[i]])
+    return sfpoints
+
+bb = nc.Dataset('/nesi/nobackup/mocean02574/NZB_3/nz5km_his_201601.nc')
 
 class Grid2:
     def __init__(self, lons, lats, bb):
@@ -147,30 +192,26 @@ mat0 = np.full((cells, cells+1), fill_value=0)
 
 sfpoints = [] 
 
-for file in glob.glob('bigboy/LWR_1996*'):
-	sfpoints.append(customout_to_startfinal_points(file))
+
+all = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+#summer = ['05', '06', '07', '08', '09', '10']
+#winter = ['11', '12', '01', '02', '03', '04']
+
+winter = ['01', '02', '03']
+spring = ['04', '05', '06']
+summer = ['07', '08', '09']
+fall = ['10', '11', '12']
+
+for month in all:
+	for file in glob.glob(f'bigboy/all_settlement/*{month}.nc'):
+		print(file)
+		sfpoints.append(nc_to_startfinal_points(file))
 
 
 mat1 = points_to_binmatrix(mat0, sfpoints)
 
-num=np.sum(mat1[30])
-just14 = mat1[:, [30, 80, 81, 157, 173, 187, 199, 235, 247, 249, 271, 316, 432, 442]]
-just14 = just14[[30, 80, 81, 157, 173, 187, 199, 235, 247, 249, 271, 316, 432, 442], :]
 
-site_order = [8, 12, 13, 5, 6, 7, 4, 11, 10, 9, 3, 2, 1, 0]
-just14_order = just14[site_order]
-just14_order = just14_order[:,site_order]
-site_labs = ['FIO', 'BGB', 'HSB', 'TIM', 'LWR', 'WEST', 'FLE', 'TAS', 'OPO', 'GOB', 'KAI', 'CAM', 'MAU', 'CAP']
-site_labs = np.asarray(site_labs)
-site_labs = site_labs[site_order]
-df = pd.DataFrame(data = just14_order, index = site_labs, columns = site_labs)
-df_pct=df/num
-df_log=np.log10(df_pct)
-df_log[np.isneginf(df_log)] = -5
-
-
-
-outFile = open('bigboy_out.txt', 'w')
+outFile = open('bigboy_all_settlement.txt', 'w')
 np.savetxt(outFile, mat1)
 outFile.close()
 

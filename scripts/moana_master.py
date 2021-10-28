@@ -62,7 +62,7 @@ reader2.multiprocessing_fail = True
 #Create Simulation Object
 ###############################
 
-o = BivalveLarvae(loglevel=30)
+o = BivalveLarvae(loglevel=0)
 o.add_reader([reader0, reader1, reader2])
 
 ###############################
@@ -107,7 +107,7 @@ for i in range(len(times)):
 ###########
 #Load habitat
 ###########
-shp, bins = o.habitat('./14shapes/14shapes.shp') # Location of the shapefile with the habit$
+shp, bins = o.habitat('./all_reef_bins/all_reef_bins.shp') # Location of the shapefile with the habit$
 
 
 ###############################
@@ -118,7 +118,7 @@ o.set_config('environment:fallback:x_wind', 0.0)
 o.set_config('environment:fallback:y_wind', 0.0)
 o.set_config('environment:fallback:x_sea_water_velocity', 0.0)
 o.set_config('environment:fallback:y_sea_water_velocity', 0.0)
-o.set_config('environment:fallback:sea_floor_depth_below_sea_level', 100000.0)
+o.set_config('environment:fallback:sea_floor_depth_below_sea_level', 12000.0)
 
 Kxy = 0.1176  #m2/s-1
 Kz = 0.01 #m2/s-1
@@ -134,6 +134,11 @@ o.set_config('general:seafloor_action', 'lift_to_seafloor')
 o.set_config('drift:vertical_mixing', False)
 o.set_config('general:coastline_action','previous')
 o.set_config('drift:settlement_in_habitat', True)
+#o.set_config('drift:maximum_depth', -50)
+#o.set_config('drift:minimum_depth', -5)
+#o.set_config('drift:vertical_velocity', .003)
+#o.set_config('drift:active_vertical_swimming', True)
+#o.set_config('drift:persistence', 50)
 
 o.list_config()
 
@@ -150,23 +155,24 @@ o.run(stop_on_error=False,
       end_time=reader2.end_time,
       time_step=3600, 
       time_step_output = 3600.0,
-      export_variables = [])
+      export_variables = ['trajectory', 'time', 'age_seconds', 'lon', 'lat', 'z'],
+      outfile = f'{args.output}{args.name}_{yyyy0}{mm0}.nc')
 
-index_of_first, index_of_last = o.index_of_activation_and_deactivation()
-lons = o.get_property('lon')[0]
-lats = o.get_property('lat')[0]
-status = o.get_property('status')[0]
-lons_end = lons[index_of_last, range(lons.shape[1])]
-lats_end = lats[index_of_last, range(lons.shape[1])]
-status_end = status[index_of_last, range(lons.shape[1])]
-print(o.status_categories)
+#index_of_first, index_of_last = o.index_of_activation_and_deactivation()
+#lons = o.get_property('lon')[0]
+#lats = o.get_property('lat')[0]
+#status = o.get_property('status')[0]
+#lons_end = lons[index_of_last, range(lons.shape[1])]
+#lats_end = lats[index_of_last, range(lons.shape[1])]
+#status_end = status[index_of_last, range(lons.shape[1])]
+#print(o.status_categories)
 
-outFile = open(f'{args.output}{args.name}_{yyyy0}{mm0}.txt','w')
+#outFile = open(f'{args.output}{args.name}_{yyyy0}{mm0}.txt','w')
 
-for i in range(len(lons_end)):
-  outFile.write(str(lons_start[i])+","+str(lats_start[i])+","+str(lons_end[i])+","+str(lats_end[i])+","+str(o.status_categories[status_end[i]])+"\n")
+#for i in range(len(lons_end)):
+#  outFile.write(str(lons_start[i])+","+str(lats_start[i])+","+str(lons_end[i])+","+str(lats_end[i])+","+str(o.status_categories[status_end[i]])+"\n")
 
-outFile.close()
+#outFile.close()
 
 #o.plot(filename=f'{args.name}_{yyyy0}{mm0}.jpg')
 
