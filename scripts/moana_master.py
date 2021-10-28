@@ -134,11 +134,11 @@ o.set_config('general:seafloor_action', 'lift_to_seafloor')
 o.set_config('drift:vertical_mixing', False)
 o.set_config('general:coastline_action','previous')
 o.set_config('drift:settlement_in_habitat', True)
-o.set_config('drift:maximum_depth', -50)
-o.set_config('drift:minimum_depth', -5)
-o.set_config('drift:vertical_velocity', .003)
-o.set_config('drift:active_vertical_swimming', True)
-o.set_config('drift:persistence', 50)
+#o.set_config('drift:maximum_depth', -50)
+#o.set_config('drift:minimum_depth', -5)
+#o.set_config('drift:vertical_velocity', .003)
+#o.set_config('drift:active_vertical_swimming', True)
+#o.set_config('drift:persistence', 50)
 
 o.list_config()
 
@@ -168,10 +168,10 @@ o.run(stop_on_error=False,
 #print(o.status_categories)
 
 #outFile = open(f'{args.output}{args.name}_{yyyy0}{mm0}.txt','w')
-#
+
 #for i in range(len(lons_end)):
 #  outFile.write(str(lons_start[i])+","+str(lats_start[i])+","+str(lons_end[i])+","+str(lats_end[i])+","+str(o.status_categories[status_end[i]])+"\n")
-#
+
 #outFile.close()
 
 #o.plot(filename=f'{args.name}_{yyyy0}{mm0}.jpg')
