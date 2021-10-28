@@ -9,12 +9,12 @@ z_rho = bb.variables['z_rho'][:]
 lon = bb.variables['lon_rho'][:]
 lat = bb.variables['lat_rho'][:]
 
-#targetlon = 168.181034
-#targetlat = -46.909673
-#closestlon = [abs(lon[0,i]-targetlon) for i in range(len(lon[0]))]
-#closestlon = closestlon.index(min(closestlon))
-#closestlat = [abs(lat[i,0]-targetlat) for i in range(len(lat))]
-#closestlat = closestlat.index(min(closestlat))
+targetlon = 174.0
+targetlat = -42.0
+closestlon = [abs(lon[0,i]-targetlon) for i in range(len(lon[0]))]
+closestlon = closestlon.index(min(closestlon))
+closestlat = [abs(lat[i,0]-targetlat) for i in range(len(lat))]
+closestlat = closestlat.index(min(closestlat))
 
 font = {'family' : 'normal',
         'weight' : 'bold',
