@@ -27,6 +27,7 @@ def customout_to_startfinal_points(txt_in):
         sfpoints.append([Point(float(elems[0]), float(elems[1])), Point(float(elems[2]), float(elems[3])), elems[4]])
     return sfpoints
 
+
 def nc_to_startfinal_points(nc_in):
     '''
     Extract the start and final locations as shapely Points and end status 
@@ -158,14 +159,39 @@ def points_to_binmatrix(matrix, sfpoints):
     return matrix
 
 
+def points_to_binmatrix(matrix, sfpoints):
+    '''
+    Build connectivity matrix from start+final points of trajectories using bin IDs.
+
+    matrix: a 2d np.array of size (n, n+1), where n is equal to len(bins).
+    sfpoints: a list of lists x where each element of x is a list that contains
+    the start and final locations as shapely Points and end status for each particle.
+    e.g. x = [[Point,Point, status],[Point, Point, status]]
+    '''
+    for x in sfpoints:
+        sfbins = []
+        for i in range(len(x)):
+            start_bin_idx = grid.get_bin_idx(x[i][0].x, x[i][0].y) +1
+            final_bin_idx = grid.get_bin_idx(x[i][1].x, x[i][1].y) +1
+            sfbins.append([start_bin_idx, final_bin_idx])
+        #print(len(sfbins))
+        for i in sfbins:
+            if i[0] != 0:
+                if i[1] == -1:
+                    matrix[i[0]-1, -1] += 1
+                else:
+                    matrix[i[0]-1, i[1]-1] += 1
+    return matrix
 
 
 
-cells = len(np.where(grid.bin_idx>=0)[0])
 
-mat0 = np.empty((cells, cells+1))
+cells = len(np.where(grid.bin_idx>0)[0])
+
+mat0 = np.full((cells, cells+1), fill_value=0)
 
 sfpoints = [] 
+
 
 all = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
 #summer = ['05', '06', '07', '08', '09', '10']
@@ -188,6 +214,10 @@ mat1 = points_to_binmatrix(mat0, sfpoints)
 outFile = open(f'/nesi/project/vuw03073/testScripts/bigboy_all_settlement_out/{sys.argv[1]}.txt', 'w')
 np.savetxt(outFile, mat1)
 outFile.close()
+
+
+
+
 
 
 

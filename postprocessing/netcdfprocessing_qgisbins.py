@@ -164,6 +164,23 @@ for col in range(grid.nlon):
             grid_id = grid.get_bin_idx(((cell_maxlon+cell_minlon)/2), ((cell_maxlat+cell_minlat)/2))
             plt.annotate(str(grid_id), (((cell_maxlon+cell_minlon)/2), ((cell_maxlat+cell_minlat)/2)), ha='center', va='center')
 
+########
+#Write shapefile from bins
+########
+for col in range(grid.nlon):
+    for row in range(grid.nlat):
+        if grid.bin_idx[col, row] > 0:
+            cell_minlon = grid.min_lon+(col)*grid.cell_size
+            cell_maxlon = grid.min_lon+(col+1)*grid.cell_size
+            cell_maxlat = grid.min_lat+(row+1)*grid.cell_size
+            cell_minlat = grid.min_lat+(row)*grid.cell_size
+            xs = [cell_minlon, cell_maxlon, cell_maxlon, cell_minlon, cell_minlon]
+            ys = [cell_maxlat, cell_maxlat, cell_minlat, cell_minlat, cell_maxlat]
+            grid_id = grid.get_bin_idx(((cell_maxlon+cell_minlon)/2), ((cell_maxlat+cell_minlat)/2))
+            w.poly([[[xs[0], ys[0]],[xs[1],ys[1]],[xs[2],ys[2]],[xs[3],ys[3]]]])            
+            w.record(grid_id)
+
+w.close()
 
 def write_shape(site):
     llon = grid.bin_corners(site[0],site[1])[0]
@@ -386,30 +403,109 @@ def plot_sfpoints(sfpoints, num):
 #just for fun
 #############
 #get only 14 sites
-just14 = outmat[:, [30, 80, 81, 157, 173, 187, 199, 235, 247, 249, 271, 316, 432, 442]]
+just14 = bigboy14[:, [30, 80, 81, 157, 173, 187, 199, 235, 247, 249, 271, 316, 432, 442]]
 just14 = just14[[30, 80, 81, 157, 173, 187, 199, 235, 247, 249, 271, 316, 432, 442], :]
 
-site_order = [8, 12, 13, 5, 6, 7, 4, 11, 10, 9, 3, 2, 1, 0]
-just14_order = just14[site_order]
-just14_order = just14_order[:,site_order]
-site_labs = ['FIO', 'BGB', 'HSB', 'TIM', 'LWR', 'WEST', 'FLE', 'TAS', 'OPO', 'GOB', 'KAI', 'CAM', 'MAU', 'CAP']
-site_labs = np.asarray(site_labs)
-site_labs = site_labs[site_order]
-df = pd.DataFrame(data = just14_order, index = site_labs, columns = site_labs)
-num=61488
-df_pct=df/num
-df_log=np.log10(df_pct)
-df_log[np.isneginf(df_log)] = -4.7
+just19 = bigboy19[:, [30, 49, 80, 81, 92, 148, 157, 173, 207, 235, 241, 247, 249, 272, 309, 374, 405, 432, 442]]
+just19 = just19[[30, 49, 80, 81, 92, 148, 157, 173, 207, 235, 241, 247, 249, 272, 309, 374, 405, 432, 442], :]
 
-ax = sns.heatmap(df_log, cbar_kws={'label': 'log10(% migrants)'})
+just22 = bigboy22[:, [30, 49, 80, 81, 92, 148, 157, 173, 207, 235, 241, 247, 249, 272, 309, 350, 368, 374, 405, 432, 442, 499]]
+just22 = just22[[30, 49, 80, 81, 92, 148, 157, 173, 207, 235, 241, 247, 249, 272, 309, 350, 368, 374, 405, 432, 442, 499], :]
+
+site_bins14 = {'FIO':30, 'BGB':80, 'HSB':81, 'TIM':157, 'LWR':173, 'WEST':187, 'FLE':200, 'TAS':235, 'OPO':247, 'GOB':249, 'KAI':271, 'CAM':316, 'MAU':432, 'CAP':442}
+site_bins19 = {'FIO':30, 'RIV':49, 'BGB':80, 'HSB':81, 'JAB':92, 'NMC':148, 'TIM':157, 'LWR':173, 'GOL':207, 'TAS':235, 'HOU':241, 'OPO':247, 'GOB':249, 'KAT':272, 'POG':309, 'PAK':374, 'TEK':405, 'MAU':432, 'CAP':442}
+site_bins22 = {'FIO':30, 'RIV':49, 'BGB':80, 'HSB':81, 'JAB':92, 'NMC':148, 'TIM':157, 'LWR':173, 'GOL':207, 'TAS':235, 'HOU':241, 'OPO':247, 'GOB':249, 'KAT':272, 'POG':309, 'RUA': 350, 'DAB': 368, 'PAK':374, 'TEK':405, 'MAU':432, 'CAP':442, 'HIC': 499}
+
+'FIO' = 0
+'RIV' = 1
+'BGB' = 2
+'HSB' = 3
+'JAB' = 4
+'NMC' = 5
+'TIM' = 6
+'LWR' = 7
+'GOL' = 8
+'TAS' = 9
+'HOU' = 10
+'OPO' = 11
+'GOB' = 12
+'KAT' = 13
+'POG' = 14
+'RUA' = 15
+'DAB' = 16
+'PAK' = 17
+'TEK' = 18
+'MAU' = 19
+'CAP' = 20
+'HIC' = 21
+
+
+
+#site_order14 = [8, 12, 5, 6, 7, 4, 13, 11, 10, 9, 3, 2, 1, 0]
+#site_order19 = [11, 10, 15, 16, 17, 13, 9, 8, 7, 5, 14, 18, 12, 6, 3, 2, 1, 0, 4]
+site_order22 = [15, 11, 10, 17, 18, 19, 21, 13, 14, 9, 8, 7, 5, 20, 16, 12, 6, 3, 2, 1, 0, 4]
+#just19_order = just19[site_order19]
+#just19_order = just19_order[:,site_order19]
+just22_order = just22[site_order22]
+just22_order = just22_order[:,site_order22]
+
+#site_labs14 = ['FIO', 'BGB', 'HSB', 'TIM', 'LWR', 'WEST', 'FLE', 'TAS', 'OPO', 'GOB', 'KAI', 'CAM', 'MAU', 'CAP']
+#site_labs19 = ['FIO', 'RIV', 'BGB', 'HSB', 'JAB', 'NMC', 'TIM', 'LWR', 'GOL', 'TAS', 'RUA', 'OPO', 'GOB', 'KAT', 'POG', 'PAK', 'TEK', 'MAU', 'CAP']
+site_labs22 = ['FIO', 'RIV', 'BGB', 'HSB', 'JAB', 'NMC', 'TIM', 'LWR', 'GOL', 'TAS', 'HOU', 'OPO', 'GOB', 'KAT', 'POG', 'RUA', 'DAB', 'PAK', 'TEK', 'MAU', 'CAP', 'HIC']
+site_labs = np.asarray(site_labs22)
+site_labs = site_labs[site_order22]
+df = pd.DataFrame(data = just22_order, index = site_labs, columns = site_labs)
+num=np.sum(bigboy22[30])
+df_pct=(df/num)*100
+df_log=np.log10(df_pct)
+df_log[np.isneginf(df_log)] = -5
+
+ax = sns.heatmap(df_log, cbar_kws={'label': 'log10(% migrants)'})#, annot=True, fmt='.0f')
 ax.invert_xaxis()
 #ax.set_xlabel("Destination Population")
 #ax.set_ylabel("Source Population")
 #ax.set(xlabel='common xlabel', ylabel='common ylabel')
 plt.xlabel("Destination Population")
 plt.ylabel("Source Population")
+#plt.title("Ocean Connectivity")
 plt.tight_layout()
 plt.show()
+
+
+#############
+#identify outlier events
+#############
+start_site='CAP'
+end_site='KAI'
+end_bin=site_bins[end_site]
+total_particles=0
+particles_per_month=0
+number_of_months=0
+s = 's'
+
+def wanderers(start_site, end_site):
+    print('mm yyyy: #particles')
+    total_particles=0
+    particles_per_month=0
+    number_of_months=0
+    s = 's'
+    for file in sorted(glob.glob(f'bigboy/*{start_site}*')):
+        new_month=True
+        new_month_print=False
+        particles_per_month=0
+        pts = customout_to_startfinal_points(file)
+        for part in pts:
+            if grid.get_bin_idx(part[1].x, part[1].y) == site_bins[end_site]:
+                total_particles+=1
+                particles_per_month+=1
+                if new_month:
+                    number_of_months+=1
+                    new_month=False
+                    new_month_print=True
+        if new_month_print:
+            print(f'{file[-6:-4]} {file[-10:-6]}: {particles_per_month}')
+    print(f'{total_particles} particle{s*(total_particles>1)} made it from {start_site} to {end_site} over {number_of_months} unique months')
+
 
 
 #############
