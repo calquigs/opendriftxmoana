@@ -444,6 +444,8 @@ site_bins22 = {'FIO':30, 'RIV':49, 'BGB':80, 'HSB':81, 'JAB':92, 'NMC':148, 'TIM
 #site_order14 = [8, 12, 5, 6, 7, 4, 13, 11, 10, 9, 3, 2, 1, 0]
 #site_order19 = [11, 10, 15, 16, 17, 13, 9, 8, 7, 5, 14, 18, 12, 6, 3, 2, 1, 0, 4]
 site_order22 = [15, 11, 10, 17, 18, 19, 21, 13, 14, 9, 8, 7, 5, 20, 16, 12, 6, 3, 2, 1, 0, 4]
+just14_order = just14[site_order14]
+just14_order = just14_order[:,site_order14]
 #just19_order = just19[site_order19]
 #just19_order = just19_order[:,site_order19]
 just22_order = just22[site_order22]
@@ -452,13 +454,13 @@ just22_order = just22_order[:,site_order22]
 #site_labs14 = ['FIO', 'BGB', 'HSB', 'TIM', 'LWR', 'WEST', 'FLE', 'TAS', 'OPO', 'GOB', 'KAI', 'CAM', 'MAU', 'CAP']
 #site_labs19 = ['FIO', 'RIV', 'BGB', 'HSB', 'JAB', 'NMC', 'TIM', 'LWR', 'GOL', 'TAS', 'RUA', 'OPO', 'GOB', 'KAT', 'POG', 'PAK', 'TEK', 'MAU', 'CAP']
 site_labs22 = ['FIO', 'RIV', 'BGB', 'HSB', 'JAB', 'NMC', 'TIM', 'LWR', 'GOL', 'TAS', 'HOU', 'OPO', 'GOB', 'KAT', 'POG', 'RUA', 'DAB', 'PAK', 'TEK', 'MAU', 'CAP', 'HIC']
-site_labs = np.asarray(site_labs22)
-site_labs = site_labs[site_order22]
-df = pd.DataFrame(data = just22_order, index = site_labs, columns = site_labs)
-num=np.sum(bigboy22[30])
+site_labs = np.asarray(site_labs14)
+site_labs = site_labs[site_order14]
+df = pd.DataFrame(data = just14_order, index = site_labs, columns = site_labs)
+num=np.sum(bigboy14[30])
 df_pct=(df/num)*100
 df_log=np.log10(df_pct)
-df_log[np.isneginf(df_log)] = -5
+df_log[np.isneginf(df_log)] = -3
 
 ax = sns.heatmap(df_log, cbar_kws={'label': 'log10(% migrants)'})#, annot=True, fmt='.0f')
 ax.invert_xaxis()

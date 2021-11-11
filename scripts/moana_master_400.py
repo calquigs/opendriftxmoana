@@ -19,8 +19,9 @@ parser.add_argument('-i', '--input', type=str, required=True, help='Input reaade
 parser.add_argument('-o', '--output', type=str, help='Output file path (ending in /')
 parser.add_argument('-n', '--name', type=str, default='opendrift', help='Output file name')
 parser.add_argument('-ym', '--yearmonth', type=int, required=True, help='Month and year to seed (yyyymm)')
-parser.add_argument('-lon', '--upperleftlon', type=float, required=True, help='Longitude of upper left hand corner of .05 deg bin to seed')
-parser.add_argument('-lat', '--upperleftlat', type=float, required=True, help='Latitude of upper left hand corner of .05 deg bin to seed')
+#parser.add_argument('-lon', '--upperleftlon', type=float, required=True, help='Longitude of upper left hand corner of .05 deg bin to seed')
+#parser.add_argument('-lat', '--upperleftlat', type=float, required=True, help='Latitude of upper left hand corner of .05 deg bin to seed')
+parser.add_argument('-r', '--region', type=float, required=True, help='Region to run')
 
 args = parser.parse_args()
 
@@ -69,17 +70,22 @@ o.add_reader([reader0, reader1, reader2])
 #Seed Particles
 ###############################
 
+shape_filename = "Desktop/opendrift/shapefiles/all_reef_bins/all_reef_bins.shp"
+shp = shapefile.Reader(shape_filename)
+#bins = shp.shapes()
+records = shp.records()
+
+#bins_region = [bins[i] for i in range(len(bins)) if records[i][3] == args.region]
+records_region = [records[i] for i in range(len(bins)) if records[i][3] == args.region]
+
+
 ullon = args.upperleftlon 
 ullat = args.upperleftlat
 
 #lons = [ullon, ullon+.1, ullon+.1, ullon]
 #lats = [ullat, ullat, ullat-.1, ullat-.1]
-lon = ullon+.05
-lat = ullat-.05
-
-
-#print(lons)
-#print(lats)
+lons = [record[1]+.05 for record in records_region] 
+lats = [record[2]-.05 for record in records_region] 
 
 def create_seed_times(start, end, delta):
   """
@@ -101,13 +107,13 @@ number = 11
 z = np.random.uniform(-10,0,size=len(times)) # generate random depth
 
 for i in range(len(times)):
-  o.seed_elements(lon, lat, number = number, radius=2500, radius_type='uniform',time = times[i], z = z[i])
+  o.seed_elements(lons, lats, number = number, radius=2500, radius_type='uniform',time = times[i], z = z[i])
 
 
 ###########
 #Load habitat
 ###########
-shp, bins = o.habitat('./14shapes/14shapes.shp') # Location of the shapefile with the habit$
+shp, bins = o.habitat('./all_reef_bins/all_reef_bins.shp') # Location of the shapefile with the habit$
 
 
 ###############################
@@ -149,7 +155,7 @@ lats_start = o.elements_scheduled.lat
 o.run(stop_on_error=False,
       end_time=reader2.end_time,
       time_step=3600, 
-      time_step_output = 3600.0,
+      time_step_output = 3600.0*12,
       export_variables = [])
 
 index_of_first, index_of_last = o.index_of_activation_and_deactivation()
