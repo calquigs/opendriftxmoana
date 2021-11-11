@@ -62,7 +62,7 @@ reader2.multiprocessing_fail = True
 #Create Simulation Object
 ###############################
 
-o = BivalveLarvae(loglevel=0)
+o = BivalveLarvae(loglevel=30)
 o.add_reader([reader0, reader1, reader2])
 
 ###############################
@@ -107,7 +107,7 @@ for i in range(len(times)):
 ###########
 #Load habitat
 ###########
-shp, bins = o.habitat('./all_reef_bins/all_reef_bins.shp') # Location of the shapefile with the habit$
+shp, bins = o.habitat('/nesi/project/vuw03073/testScripts/all_reef_bins/all_reef_bins.shp') # Location of the shapefile with the habit$
 
 
 ###############################

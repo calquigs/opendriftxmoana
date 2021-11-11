@@ -176,16 +176,16 @@ spring = ['04', '05', '06']
 summer = ['07', '08', '09']
 fall = ['10', '11', '12']
 
-for month in all:
-	for file in glob.glob(f'bigboy/all_settlement/*{month}.nc'):
-		print(file)
-		sfpoints.append(nc_to_startfinal_points(file))
+#for month in all:
+for file in glob.glob(f'/nesi/nobackup/vuw03073/bigboy/all_settlement/{sys.argv[1]}*'):
+	print(file)
+	sfpoints.append(nc_to_startfinal_points(file))
 
 
 mat1 = points_to_binmatrix(mat0, sfpoints)
 
 
-outFile = open('bigboy_all_settlement.txt', 'w')
+outFile = open(f'/nesi/project/vuw03073/testScripts/bigboy_all_settlement_out/{sys.argv[1]}.txt', 'w')
 np.savetxt(outFile, mat1)
 outFile.close()
 
