@@ -104,17 +104,17 @@ pdf_south = pdf_CAP + pdf_CAM + pdf_KAI + pdf_GOB + pdf_TIM + pdf_HSB + pdf_BGB 
 pdf_central = pdf_WEST + pdf_FLE + pdf_TAS + pdf_LWR
 pdf_north = pdf_OPO + pdf_MAU
 
-m = Basemap(resolution= 'h', llcrnrlon = 165, llcrnrlat = miny-1.5, urcrnrlon = maxx+1.5, urcrnrlat = maxy+1.5, area_thresh = 500)
+m = Basemap(resolution= 'h', llcrnrlon = 165, llcrnrlat = -52, urcrnrlon = 184, urcrnrlat = -32, area_thresh = 500)
 m.drawmapboundary(fill_color='#DDEEFF')#, zorder = 0)
 #m.drawcoastlines(color = '#B1A691')#, zorder = 15)
 m.fillcontinents(color='#FDF5E6', lake_color = '#FDF5E6')#, zorder = 20)
 lon_bins_2d, lat_bins_2d = np.meshgrid(lon_edges, lat_edges)
 xs, ys = m(lon_bins_2d, lat_bins_2d)
 pdf[pdf==0]=np.min(pdf[pdf>0])
-clr = plt.pcolormesh(xs, ys, pdf+pdf_LWR, norm=colors.LogNorm(), cmap = 'jet')
+clr = plt.pcolormesh(xs, ys, pdf_MAU, norm=colors.LogNorm(), cmap = 'jet')
 plt.gca().add_patch(plt.Rectangle((math.floor(lon[0,0]*10)/10, math.floor(lat[0,0]*10)/10), .1, .1, edgecolor = 'black', fill=False))
 plt.colorbar(clr)
-plt.title('TAS')
+plt.title('')
 
 
 
