@@ -403,7 +403,7 @@ def plot_sfpoints(sfpoints, num):
 #just for fun
 #############
 #get only 14 sites
-just14 = bigboy14[:, [30, 80, 81, 157, 173, 187, 199, 235, 247, 249, 271, 316, 432, 442]]
+just14 = bigboy[:, [30, 80, 81, 157, 173, 187, 199, 235, 247, 249, 271, 316, 432, 442]]
 just14 = just14[[30, 80, 81, 157, 173, 187, 199, 235, 247, 249, 271, 316, 432, 442], :]
 
 just19 = bigboy19[:, [30, 49, 80, 81, 92, 148, 157, 173, 207, 235, 241, 247, 249, 272, 309, 374, 405, 432, 442]]
@@ -457,12 +457,15 @@ site_labs22 = ['FIO', 'RIV', 'BGB', 'HSB', 'JAB', 'NMC', 'TIM', 'LWR', 'GOL', 'T
 site_labs = np.asarray(site_labs14)
 site_labs = site_labs[site_order14]
 df = pd.DataFrame(data = just14_order, index = site_labs, columns = site_labs)
-num=np.sum(bigboy14[30])
+num=np.sum(bigboy[30])
 df_pct=(df/num)*100
 df_log=np.log10(df_pct)
-df_log[np.isneginf(df_log)] = -3
+df_log[np.isneginf(df_log)] = -5
 
-ax = sns.heatmap(df_log, cbar_kws={'label': 'log10(% migrants)'})#, annot=True, fmt='.0f')
+ax = sns.heatmap(df_log, cbar_kws={'label': '% Succesful migrants)'})#, annot=True, fmt='.0f')
+cbar = ax.collections[0].colorbar
+cbar.set_ticks([1,0,-1,-2,-3])
+cbar.set_ticklabels([10,1,.1,.01,.001])
 ax.invert_xaxis()
 #ax.set_xlabel("Destination Population")
 #ax.set_ylabel("Source Population")
