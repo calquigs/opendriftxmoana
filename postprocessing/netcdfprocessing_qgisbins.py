@@ -451,12 +451,12 @@ just14_order = just14_order[:,site_order14]
 just22_order = just22[site_order22]
 just22_order = just22_order[:,site_order22]
 
-#site_labs14 = ['FIO', 'BGB', 'HSB', 'TIM', 'LWR', 'WEST', 'FLE', 'TAS', 'OPO', 'GOB', 'KAI', 'CAM', 'MAU', 'CAP']
-#site_labs19 = ['FIO', 'RIV', 'BGB', 'HSB', 'JAB', 'NMC', 'TIM', 'LWR', 'GOL', 'TAS', 'RUA', 'OPO', 'GOB', 'KAT', 'POG', 'PAK', 'TEK', 'MAU', 'CAP']
+site_labs14 = ['FIO', 'BGB', 'HSB', 'TIM', 'LWR', 'WEST', 'FLE', 'TAS', 'OPO', 'GOB', 'KAI', 'CAM', 'MAU', 'CAP']
+site_labs19 = ['FIO', 'RIV', 'BGB', 'HSB', 'JAB', 'NMC', 'TIM', 'LWR', 'GOL', 'TAS', 'RUA', 'OPO', 'GOB', 'KAT', 'POG', 'PAK', 'TEK', 'MAU', 'CAP']
 site_labs22 = ['FIO', 'RIV', 'BGB', 'HSB', 'JAB', 'NMC', 'TIM', 'LWR', 'GOL', 'TAS', 'HOU', 'OPO', 'GOB', 'KAT', 'POG', 'RUA', 'DAB', 'PAK', 'TEK', 'MAU', 'CAP', 'HIC']
-site_labs = np.asarray(site_labs14)
-site_labs = site_labs[site_order14]
-df = pd.DataFrame(data = just14_order, index = site_labs, columns = site_labs)
+site_labs = np.asarray(site_labs22)
+site_labs = site_labs[site_order22]
+df = pd.DataFrame(data = just22_order, index = site_labs, columns = site_labs)
 num=np.sum(bigboy[30])
 df_pct=(df/num)*100
 df_log=np.log10(df_pct)
@@ -552,4 +552,49 @@ for i in range(len(matrixr[0,:])):
     if sum(matrixr[:,i]) > 0:
         matrixtrim[:, count] = matrixr[:,i]
         count += 1
+
+
+
+for file in glob.glob('/nesi/nobackup/vuw03073/bigboy/all_settlement/'):
+    sfpoints = (nc_to_startfinal_points(file))
+
+
+site_order14 = [0, 1, 5, 4, 3, 6, 2, 13, 12, 11, 10, 9, 8, 7]#[::-1]
+site_labs14 = ['OPO', 'MAU', 'CAP', 'TAS', 'FLE', 'WEST', 'LWR', 'FIO', 'BGB', 'HSB', 'TIM', 'GOB', 'KAI', 'CAM']
+
+
+
+just14 = mat1[:, [39, 124, 187, 230, 235, 239, 246, 288, 346, 347, 374, 390, 395, 402]]
+just14 = just14[[39, 124, 187, 230, 235, 239, 246, 288, 346, 347, 374, 390, 395, 402], :]
+
+site_labs = np.asarray(site_labs14)
+site_labs = site_labs[site_order14]
+df = pd.DataFrame(data = just14_order, index = site_labs, columns = site_labs)
+num=np.sum(mat1[39])
+df_pct=(df/num)*100
+df_log=np.log10(df_pct)
+
+ax = sns.heatmap(df_log, cbar_kws={'label': '% Succesful migrants)'})#, annot=True, fmt='.0f')
+cbar = ax.collections[0].colorbar
+cbar.set_ticks([1,0,-1,-2,-3])
+cbar.set_ticklabels([10,1,.1,.01,.001])
+ax.invert_xaxis()
+#ax.set_xlabel("Destination Population")
+#ax.set_ylabel("Source Population")
+#ax.set(xlabel='common xlabel', ylabel='common ylabel')
+plt.xlabel("Destination Population")
+plt.ylabel("Source Population")
+#plt.title("Ocean Connectivity")
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+
+
+
 

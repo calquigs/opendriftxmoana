@@ -7,11 +7,14 @@ import netCDF4 as nc
 import pandas as pd
 import math
 import glob
+import copy
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import seaborn as sns
 from mpl_toolkits.basemap import Basemap
 from matplotlib import colors
+from scipy import stats
+
 
 from eofs.standard import Eof
 
@@ -28,11 +31,15 @@ site_labs14 = [r'$\mathregular{FIO_S}$', r'$\mathregular{BGB_S}$', r'$\mathregul
 site_labs = np.asarray(site_labs14)
 site_labs = site_labs[site_order14]
 
-df = pd.DataFrame(data = just14_order, index = site_labs, columns = site_labs)
+just14_order2 = just14_order[fst_site_order]
+just14_order2 = just14_order2[:,fst_site_order]
+df = pd.DataFrame(data = just14_order, index = fst_site_labs, columns = fst_site_labs)
 num=np.sum(bigboy14[30])
 df_pct=(df/num)*100
 df_log=np.log10(df_pct)
 df_log[np.isneginf(df_log)] = -5
+
+
 
 ax = sns.heatmap(df_log, cbar_kws={'label': '% Succesful settlement'})#, annot=True, fmt='.0f')
 cbar = ax.collections[0].colorbar
@@ -41,11 +48,70 @@ cbar.set_ticklabels([10,1,.1,.01,.001])
 ax.invert_xaxis()
 plt.xlabel("Destination Population")
 plt.ylabel("Source Population")
-#plt.title("Ocean Connectivity")
+plt.title("Oceanographic Connectivity")
 plt.tight_layout()
 plt.show()
 
 
+fst = np.array(([[0,0.014,-0.010,0,0.007,0.033,0.002,0.005,0.019,0.021,0.07,0.027,0.052,0.039],
+[0.014,0,0.008,0.019,0.008,0.037,0.022,0.019,0.026,0.03,0.081,0.038,0.071,0.038],
+[-0.010,0.008,0,-0.008,-0.001,0.021,-0.007,-0.008,0.005,0.012,0.058,0.013,0.04,0.033],
+[0,0.019,-0.008,0,0.011,0.02,0.009,0.006,0,0.01,0.053,0.007,0.038,0.036],
+[0.007,0.008,-0.001,0.011,0,0.024,0.004,0.013,0.01,0.014,0.054,0.019,0.042,0.028],
+[0.033,0.037,0.021,0.02,0.024,0,0.028,0.029,0.009,0.008,0.036,0,0.03,0.001],
+[0.002,0.022,-0.007,0.009,0.004,0.028,0,0.006,0.017,0.019,0.055,0.024,0.043,0.036],
+[0.005,0.019,-0.008,0.006,0.013,0.029,0.006,0,0.019,0.031,0.074,0.026,0.063,0.048],
+[0.019,0.026,0.005,0,0.01,0.009,0.017,0.019,0,-0.001,0.021,0.006,0.02,0.017],
+[0.021,0.03,0.012,0.01,0.014,0.008,0.019,0.031,-0.001,0,0.017,0.008,0.017,0.001],
+[0.07,0.081,0.058,0.053,0.054,0.036,0.055,0.074,0.021,0.017,0,0.02,0.011,0.021],
+[0.027,0.038,0.013,0.007,0.019,0,0.024,0.026,0.006,0.008,0.02,0,0.013,0.013],
+[0.052,0.071,0.04,0.038,0.042,0.03,0.043,0.063,0.02,0.017,0.011,0.013,0,0.028],
+[0.039,0.038,0.033,0.036,0.028,0.001,0.036,0.048,0.017,0.001,0.021,0.013,0.028,0]]))
+
+fst[fst<0] = 0
+
+fst_df = pd.DataFrame(data = fst, index = site_labs, columns = site_labs)
+
+cmap = sns.cm.rocket_r
+ax = sns.heatmap(fst_df, cbar_kws={'label': 'Fst'}, cmap=cmap)#, annot=True, fmt='.0f')
+cbar = ax.collections[0].colorbar
+#cbar.set_ticks([1,0,-1,-2,-3])
+#cbar.set_ticklabels([10,1,.1,.01,.001])
+ax.invert_xaxis()
+#plt.xlabel("Destination Population")
+#plt.ylabel("Source Population")
+#plt.title("Ocean Connectivity")
+plt.tight_layout()
+plt.title('Genetic connectivity')
+plt.show()
+
+fst_site_order = [0,2,3,7,6,4,1,8,9,5,11,13,12,10]
+fst_order = fst[fst_site_order]
+fst_order = fst_order[:,fst_site_order]
+fst_site_labs = [site_labs[i] for i in fst_site_order]
+fst_order_df = pd.DataFrame(data = fst_order, index = fst_site_labs, columns = fst_site_labs)
+
+ax = sns.heatmap(fst_order_df, cbar_kws={'label': 'Fst'}, cmap=cmap)#, annot=True, fmt='.0f')
+cbar = ax.collections[0].colorbar
+#cbar.set_ticks([1,0,-1,-2,-3])
+#cbar.set_ticklabels([10,1,.1,.01,.001])
+ax.invert_xaxis()
+#plt.xlabel("Destination Population")
+#plt.ylabel("Source Population")
+plt.title("Genetic Connectivity")
+plt.tight_layout()
+plt.show()
+
+just14_pct = just14_order/num
+m, b = np.polyfit(np.log10(just14_pct[just14_pct!=0].flatten()), fst[just14_pct!=0].flatten(), 1)
+r = stats.pearsonr(np.log10(just14_pct[just14_pct!=0].flatten()), fst[just14_pct!=0].flatten())
+
+plt.scatter(np.log10(just14_pct.flatten()), fst.flatten(), color = 'black')
+plt.plot(np.log10(just14_pct.flatten()), m*np.log10(just14_pct.flatten()) + b, color = 'red')
+plt.xlabel('Oceanographic connectivity (log10(% migrants)')
+plt.ylabel('Genetic connectivity (Fst)')
+plt.title('Correlation coefficient (R) = -.327, p = 2.7e-6')
+plt.show()
 
 #PDFs for each site
 
@@ -64,8 +130,13 @@ pdf_HSB = np.zeros((801,761))
 pdf_BGB = np.zeros((801,761))
 pdf_FIO = np.zeros((801,761))
 
+
 pdfs = [pdf_OPO,pdf_MAU,pdf_WEST,pdf_FLE,pdf_TAS,pdf_LWR,pdf_CAP,pdf_CAM,pdf_KAI,pdf_GOB,pdf_TIM,pdf_HSB,pdf_BGB,pdf_FIO]
 sites = ['OPO','MAU','WEST','FLE','TAS','LWR','CAP','CAM','KAI','GOB','TIM','HSB','BGB','FIO']
+
+for i in range(len(sites)):
+	for file in glob.glob(f'bigboy_pdf/competent/{sites[i]}*'):
+		pdfs[i]+=np.loadtxt(file)
 
 pdf = np.zeros((801,761))
 minx = 360
@@ -94,20 +165,22 @@ for file in sorted(glob.glob(f'/nesi/nobackup/vuw03073/bigboy/all_settlement/FIO
 	pdf += H
 
 
-pdf_OPO = np.loadtxt('bigboy_pdf/oneeighty/OPO_pdf.txt')
-pdf_MAU = np.loadtxt('bigboy_pdf/oneeighty/MAU_pdf.txt')
-pdf_WEST = np.loadtxt('bigboy_pdf/oneeighty/WEST_pdf.txt')
-pdf_FLE = np.loadtxt('bigboy_pdf/oneeighty/FLE_pdf.txt')
-pdf_TAS = np.loadtxt('bigboy_pdf/oneeighty/TAS_pdf.txt')
-pdf_LWR = np.loadtxt('bigboy_pdf/oneeighty/LWR_pdf.txt')
-pdf_CAP = np.loadtxt('bigboy_pdf/oneeighty/CAP_pdf.txt')
-pdf_CAM = np.loadtxt('bigboy_pdf/oneeighty/CAM_pdf.txt')
-pdf_KAI = np.loadtxt('bigboy_pdf/oneeighty/KAI_pdf.txt')
-pdf_GOB = np.loadtxt('bigboy_pdf/oneeighty/GOB_pdf.txt')
-pdf_TIM = np.loadtxt('bigboy_pdf/oneeighty/TIM_pdf.txt')
-pdf_HSB = np.loadtxt('bigboy_pdf/oneeighty/HSB_pdf.txt')
-pdf_BGB = np.loadtxt('bigboy_pdf/oneeighty/BGB_pdf.txt')
-pdf_FIO = np.loadtxt('bigboy_pdf/oneeighty/FIO_pdf.txt')
+pdf_OPO = np.loadtxt('bigboy_pdf/competent/OPO_pdf.txt')
+pdf_MAU = np.loadtxt('bigboy_pdf/competent/MAU_pdf.txt')
+pdf_WEST = np.loadtxt('bigboy_pdf/competent/WEST_pdf.txt')
+pdf_FLE = np.loadtxt('bigboy_pdf/competent/FLE_pdf.txt')
+pdf_TAS = np.loadtxt('bigboy_pdf/competent/TAS_pdf.txt')
+pdf_LWR = np.loadtxt('bigboy_pdf/competent/LWR_pdf.txt')
+pdf_CAP = np.loadtxt('bigboy_pdf/competent/CAP_pdf.txt')
+pdf_CAM = np.loadtxt('bigboy_pdf/competent/CAM_pdf.txt')
+pdf_KAI = np.loadtxt('bigboy_pdf/competent/KAI_pdf.txt')
+pdf_GOB = np.loadtxt('bigboy_pdf/competent/GOB_pdf.txt')
+pdf_TIM = np.loadtxt('bigboy_pdf/competent/TIM_pdf.txt')
+pdf_HSB = np.loadtxt('bigboy_pdf/competent/HSB_pdf.txt')
+pdf_BGB = np.loadtxt('bigboy_pdf/competent/BGB_pdf.txt')
+pdf_FIO = np.loadtxt('bigboy_pdf/competent/FIO_pdf.txt')
+
+
 
 
 
@@ -115,9 +188,12 @@ pdf_south = pdf_CAP + pdf_CAM + pdf_KAI + pdf_GOB + pdf_TIM + pdf_HSB + pdf_BGB 
 pdf_central = pdf_WEST + pdf_FLE + pdf_TAS + pdf_LWR
 pdf_north = pdf_OPO + pdf_MAU
 
-site_lons=[173.2, 176.0, 176.3, 172.4, 172.7, 173.1, 174.3, 171.9, 173.7, 173.3, 171.3, 166.8, 168.2, 168.2]
-site_lats=[-35.5, -37.4, -40.9, -40.5, -40.6, -41.1, -41.7, -41.3, -42.4, -42.9, -44.4, -45.1, -46.8, -46.9]
-symbols = ['w^','w^','ws','wo','wo','wo','ws','wo','ws','ws','ws','ws','ws','ws']
+site_lons=[173.2, 176.0, 172.4, 172.7, 173.1, 176.3, 174.3, 171.9, 173.7, 173.3, 171.3, 168.2, 168.2, 166.8]
+site_lats=[-35.5, -37.4, -40.5, -40.6, -41.1, -40.9, -41.7, -41.3, -42.4, -42.9, -44.4, -46.8, -46.9, -45.1]
+site_lons=[173.2, 176.0, 172.4, 172.7, 173.1, 171.9, 176.3, 174.3, 173.7, 173.3, 171.3, 168.2, 168.2, 166.8]
+site_lats=[-35.5, -37.4, -40.5, -40.6, -41.1, -41.3, -40.9, -41.7, -42.4, -42.9, -44.4, -46.8, -46.9, -45.1]
+
+symbols = ['w^','w^','wo','wo','wo','wo','wo','ws','ws','ws','ws','ws','ws','ws']
 
 lon_edges = np.linspace(165, 184, 381)
 lat_edges = np.linspace(-52, -32, 401)
@@ -125,7 +201,7 @@ lon_edges = np.linspace(165, 184, 381*2)
 lat_edges = np.linspace(-52, -32, 401*2)
 
 
-cmap = copy.copy(mpl.cm.get_cmap("jet"))
+cmap = copy.copy(plt.cm.get_cmap("jet"))
 cmap.set_bad(cmap(0))
 
 
@@ -148,7 +224,7 @@ lon_bins_2d, lat_bins_2d = np.meshgrid(lon_edges, lat_edges)
 xs, ys = m(lon_bins_2d, lat_bins_2d)
 pdf = pdf_south / 31050096
 #pdf[pdf==0] = 1
-clr = axes[0].pcolormesh(xs, ys, pdf, norm=colors.LogNorm(), cmap = 'jet')
+clr = axes[0].pcolormesh(xs, ys, pdf, norm=colors.LogNorm(), cmap = cmap)
 #for i in range(len(site_lons)):
 #	axes[0].add_patch(plt.Rectangle((site_lons[i], site_lats[i]), .1, .1, edgecolor = 'white', fill=False))
 for i in range(len(site_lons)):
@@ -173,7 +249,7 @@ lon_bins_2d, lat_bins_2d = np.meshgrid(lon_edges, lat_edges)
 xs, ys = m(lon_bins_2d, lat_bins_2d)
 pdf = pdf_central/31050096
 #pdf[pdf==0] = 1
-clr = axes[1].pcolormesh(xs, ys, pdf, norm=colors.LogNorm(), cmap = 'jet')
+clr = axes[1].pcolormesh(xs, ys, pdf, norm=colors.LogNorm(), cmap = cmap)
 #for i in range(len(site_lons)):
 #	axes[1].add_patch(plt.Rectangle((site_lons[i], site_lats[i]), .1, .1, edgecolor = 'white', fill=False))
 for i in range(len(site_lons)):
@@ -198,7 +274,7 @@ lon_bins_2d, lat_bins_2d = np.meshgrid(lon_edges, lat_edges)
 xs, ys = m(lon_bins_2d, lat_bins_2d)
 pdf = pdf_north/31050096
 #pdf[pdf==0] = 1
-clr = axes[2].pcolormesh(xs, ys, pdf, norm=colors.LogNorm(), cmap = 'jet')
+clr = axes[2].pcolormesh(xs, ys, pdf, norm=colors.LogNorm(), cmap = cmap)
 #for i in range(len(site_lons)):
 #	axes[2].add_patch(plt.Rectangle((site_lons[i], site_lats[i]), .1, .1, edgecolor = 'white', fill=False))
 for i in range(len(site_lons)):
@@ -642,4 +718,117 @@ fig.colorbar(cm, cax=cbar_ax)
 
 
 
+
+fig, axes = plt.subplots(1,3)
+axes = axes.flatten()
+
+m = Basemap(resolution= 'h', llcrnrlon = 165, llcrnrlat = -52, urcrnrlon = 184, urcrnrlat = -32, area_thresh = 500, ax = axes[0])
+m.drawmapboundary(fill_color='#DDEEFF', zorder = 0)
+m.drawcoastlines(color = '#B1A691', zorder = 15)
+parallels = np.arange(-50.,-30,5.)
+#m.drawparallels(parallels,labels=[False,True,True,False], linewidth=0)
+meridians = np.arange(165.,185,5.)
+#m.drawmeridians(meridians,labels=[True,False,False,True], linewidth=0)
+axes[0].set_xticks(meridians)
+axes[0].set_yticks(parallels)
+axes[0].set_xticklabels(['165°E','170°E','175°E', '180°E'])
+axes[0].set_yticklabels(['50°S','45°S','40°S','35°S'])
+m.fillcontinents(color='#FDF5E6', lake_color = '#FDF5E6', zorder = 20)
+lon_bins_2d, lat_bins_2d = np.meshgrid(lon_edges, lat_edges)
+xs, ys = m(lon_bins_2d, lat_bins_2d)
+pdf = pdf_WEST
+pdf[pdf==0] = 1
+clr = axes[0].pcolormesh(xs, ys, pdf, norm=colors.LogNorm(), cmap = 'jet')
+#for i in range(len(site_lons)):
+#	axes[0].add_patch(plt.Rectangle((site_lons[i], site_lats[i]), .1, .1, edgecolor = 'white', fill=False))
+for i in range(len(site_lons)):
+	axes[0].plot(site_lons[i], site_lats[i], symbols[i], mec = 'k', zorder=30)
+
+#fig.colorbar(clr, ax = axes[0])
+axes[0].set_title('a)', loc='left')
+
+m = Basemap(resolution= 'h', llcrnrlon = 165, llcrnrlat = -52, urcrnrlon = 184, urcrnrlat = -32, area_thresh = 500, ax = axes[1])
+m.drawmapboundary(fill_color='#DDEEFF', zorder = 0)
+m.drawcoastlines(color = '#B1A691', zorder = 15)
+parallels = np.arange(-50.,-30,5.)
+#m.drawparallels(parallels,labels=[False,True,True,False], linewidth=0)
+meridians = np.arange(165.,185,5.)
+#m.drawmeridians(meridians,labels=[True,False,False,True], linewidth=0)
+axes[1].set_xticks(meridians)
+axes[1].set_yticks(parallels)
+axes[1].set_xticklabels(['165°E','170°E','175°E', '180°E'])
+axes[1].set_yticklabels([])
+m.fillcontinents(color='#FDF5E6', lake_color = '#FDF5E6', zorder = 20)
+lon_bins_2d, lat_bins_2d = np.meshgrid(lon_edges, lat_edges)
+xs, ys = m(lon_bins_2d, lat_bins_2d)
+pdf = pdf_CAM
+pdf[pdf==0] = 1
+clr = axes[1].pcolormesh(xs, ys, pdf, norm=colors.LogNorm(), cmap = 'jet')
+#for i in range(len(site_lons)):
+#	axes[1].add_patch(plt.Rectangle((site_lons[i], site_lats[i]), .1, .1, edgecolor = 'white', fill=False))
+for i in range(len(site_lons)):
+	axes[1].plot(site_lons[i], site_lats[i], symbols[i], mec = 'k', zorder=30)
+
+#fig.colorbar(clr, ax = axes[1])
+axes[1].set_title('b)', loc = 'left')
+
+m = Basemap(resolution= 'h', llcrnrlon = 165, llcrnrlat = -52, urcrnrlon = 184, urcrnrlat = -32, area_thresh = 500, ax = axes[2])
+m.drawmapboundary(fill_color='#DDEEFF', zorder = 0)
+m.drawcoastlines(color = '#B1A691', zorder = 15)
+parallels = np.arange(-50.,-30,5.)
+#m.drawparallels(parallels,labels=[False,True,True,False], linewidth=0)
+meridians = np.arange(165.,185,5.)
+#m.drawmeridians(meridians,labels=[True,False,False,True], linewidth=0)
+axes[2].set_xticks(meridians)
+axes[2].set_yticks(parallels)
+axes[2].set_xticklabels(['165°E','170°E','175°E', '180°E'])
+axes[2].set_yticklabels([])
+m.fillcontinents(color='#FDF5E6', lake_color = '#FDF5E6', zorder = 20)
+lon_bins_2d, lat_bins_2d = np.meshgrid(lon_edges, lat_edges)
+xs, ys = m(lon_bins_2d, lat_bins_2d)
+pdf = pdf_CAP
+pdf[pdf==0] = 1
+clr = axes[2].pcolormesh(xs, ys, pdf, norm=colors.LogNorm(), cmap = 'jet')
+#for i in range(len(site_lons)):
+#	axes[2].add_patch(plt.Rectangle((site_lons[i], site_lats[i]), .1, .1, edgecolor = 'white', fill=False))
+for i in range(len(site_lons)):
+	axes[2].plot(site_lons[i], site_lats[i], symbols[i], mec = 'k', zorder=30)
+
+#fig.colorbar(clr, ax = axes[2])
+axes[2].set_title('c)', loc='left')
+plt.show()
+
+
+#PLot sourciness
+settlement_success = [np.sum(i[0:-1])/np.sum(i) for i in mat1 if np.sum(i) > 30000]
+settlement_success = [settlement_success[i] for i in site_order14]
+
+downstream_pops = [len(np.where(i>0)[0]) for i in bigboy if np.sum(i) > 30000]
+downstream_pops = [downstream_pops[i] for i in site_order14]
+
+fig, ax = plt.subplots(1,1)
+
+m = Basemap(resolution= 'h', llcrnrlon = 165, llcrnrlat = -52, urcrnrlon = 184, urcrnrlat = -32, area_thresh = 500, ax = ax)
+m.drawmapboundary(fill_color='#DDEEFF', zorder = 0)
+m.drawcoastlines(color = '#B1A691', zorder = 15)
+parallels = np.arange(-50.,-30,5.)
+#m.drawparallels(parallels,labels=[False,True,True,False], linewidth=0)
+meridians = np.arange(165.,185,5.)
+#m.drawmeridians(meridians,labels=[True,False,False,True], linewidth=0)
+ax.set_xticks(meridians)
+ax.set_yticks(parallels)
+ax.set_xticklabels(['165°E','170°E','175°E', '180°E'])
+ax.set_yticklabels(['50°S','45°S','40°S','35°S'])
+m.fillcontinents(color='#FDF5E6', lake_color = '#FDF5E6', zorder = 20)
+#lon_bins_2d, lat_bins_2d = np.meshgrid(lon_edges, lat_edges)
+#xs, ys = m(lon_bins_2d, lat_bins_2d)
+#pdf = pdf_south / 31050096
+for i in range(len(site_lons)):
+	weight = (settlement_success[i]/max(settlement_success))
+	#colorhex = "#"+str(colorn)*6
+	ax.plot(site_lons[i], site_lats[i], 'o', markersize = 20*(downstream_pops[i]/max(downstream_pops)), c = 'green', alpha = weight, zorder=30)
+
+#fig.colorbar(clr, ax = ax)
+ax.set_title('a)', loc='left')
+plt.show()
 
