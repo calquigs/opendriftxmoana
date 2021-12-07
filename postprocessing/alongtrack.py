@@ -38,32 +38,34 @@ import geopy.distance
 # 		outFile.close()
 
 def calc_along_track(trajectory):
-	import pdb; pdb.set_trace()
-	lons = trajectory.lon.data
-	lats = trajectory.lat.data
-	lons = lons[(lons>-10000) & (lons < 10000)]
-	lats = lats[(lats>-10000) & (lats < 10000)]
-	along_track = 0
-	for i in range(len(lons)-1):
-		pos_t  = (lats[i], lons[i])
-		pos_t2 = (lats[i+1], lons[i+1])
-		along_track += geopy.distance.distance(pos_t, pos_t2).meters
-	pos_0 = (lats[0], lons[0])
-	pos_n = (lats[-1], lons[-1])
-	start_finish = geopy.distance.distance(pos_0, pos_n).meters
-	return along_track, start_finish
+    # import pdb; pdb.set_trace()
+    # print(trajectory.coords)
+    # trajectory
+    print(trajectory.shape)
+    #print(trajectory[0:4][0:4])
+    print(trajectory[1000][1000:1004])
+    lons = trajectory.lon.data
+    lats = trajectory.lat.data
+    lons = lons[(lons>-10000) & (lons < 10000)]
+    lats = lats[(lats>-10000) & (lats < 10000)]
+    along_track = 0
+    for i in range(len(lons)-1):
+        pos_t  = (lats[i], lons[i])
+        pos_t2 = (lats[i+1], lons[i+1])
+        along_track += geopy.distance.distance(pos_t, pos_t2).meters
+    pos_0 = (lats[0], lons[0])
+    pos_n = (lats[-1], lons[-1])
+    start_finish = geopy.distance.distance(pos_0, pos_n).meters
+    return along_track, start_finish
 
 
+file_path = 'LWR_201512.nc'
 traj = xr.open_dataset(file_path)
+print(traj)
 
-xr.apply_ufunc(calc_along_track, 
-	traj, 
-	input_core_dims = [['time']], 
-	output_core_dims=[['time']], 
-	exclude_dims=set(['time']))
-	#vectorize = True)
-
-		
-
-
-
+xr.apply_ufunc(calc_along_track,
+    traj,
+    input_core_dims=[['time']],
+    output_core_dims=[['time']],
+    exclude_dims=set(['time']))
+    #vectorize = True)
