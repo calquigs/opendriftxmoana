@@ -33,22 +33,34 @@ site_labs = site_labs[site_order14]
 
 just14_order2 = just14_order[fst_site_order]
 just14_order2 = just14_order2[:,fst_site_order]
-df = pd.DataFrame(data = just14_order, index = fst_site_labs, columns = fst_site_labs)
+df = pd.DataFrame(data = just14_order[2:, 2:], index = site_labs[2:], columns = site_labs[2:])
 num=np.sum(bigboy14[30])
 df_pct=(df/num)*100
 df_log=np.log10(df_pct)
 df_log[np.isneginf(df_log)] = -5
 
+ost_norm = np.array(([i/np.sum(i) for i in just14_order]))
+ost25 = ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm@ost_norm
 
+j14 = just14_order/num
+j14_25 = j14@j14@j14@j14@j14@j14@j14@j14@j14@j14@j14@j14@j14@j14@j14@j14@j14@j14@j14@j14@j14@j14@j14@j14@j14
+j14_25_log = np.log10(j14_25)
+j14_25_log[np.isneginf(j14_25_log)] = -55
 
-ax = sns.heatmap(df_log, cbar_kws={'label': '% Succesful settlement'})#, annot=True, fmt='.0f')
+contmat = np.array(([i/np.sum(i) for i in just14_order]))
+migmat = np.array(([i/np.sum(i) for i in just14_order.T])).T
+
+mig25 = migmat@migmat@migmat@migmat@migmat@migmat@migmat@migmat@migmat@migmat@migmat@migmat@migmat@migmat@migmat@migmat@migmat@migmat@migmat@migmat@migmat@migmat@migmat@migmat@migmat
+mig25_log = np.log10(mig25)
+
+ax = sns.heatmap(df, cbar_kws={'label': '% Contribution'})#, annot=True, fmt='.0f')
 cbar = ax.collections[0].colorbar
-cbar.set_ticks([1,0,-1,-2,-3])
-cbar.set_ticklabels([10,1,.1,.01,.001])
+cbar.set_ticks([0,-2,-4,-6,-8])
+cbar.set_ticklabels([1,'1e-2','1e-4',.000001, .00000001])
 ax.invert_xaxis()
 plt.xlabel("Destination Population")
 plt.ylabel("Source Population")
-plt.title("Oceanographic Connectivity")
+plt.title("Oceanographic Connectivity (25 generations)")
 plt.tight_layout()
 plt.show()
 
@@ -102,16 +114,63 @@ plt.title("Genetic Connectivity")
 plt.tight_layout()
 plt.show()
 
-just14_pct = just14_order/num
-m, b = np.polyfit(np.log10(just14_pct[just14_pct!=0].flatten()), fst[just14_pct!=0].flatten(), 1)
-r = stats.pearsonr(np.log10(just14_pct[just14_pct!=0].flatten()), fst[just14_pct!=0].flatten())
+just14_pct = (just14_order+1)/num
+m, b = np.polyfit(np.log10(j14_25[2:,2:]+1).flatten(), fst[2:,2:].flatten(), 1)
+r = stats.pearsonr(np.log10(j14_25[2:,2:]+1).flatten(), fst[2:,2:].flatten())
 
-plt.scatter(np.log10(just14_pct.flatten()), fst.flatten(), color = 'black')
-plt.plot(np.log10(just14_pct.flatten()), m*np.log10(just14_pct.flatten()) + b, color = 'red')
+plt.scatter(np.log10(j14_25[2:,2:]+1).flatten(), fst[2:,2:].flatten(), color = 'black')
+plt.plot(np.log10(j14_25[2:,2:]+1).flatten(), m*np.log10(j14_25[2:,2:]+1).flatten() + b, color = 'red')
 plt.xlabel('Oceanographic connectivity (log10(% migrants)')
 plt.ylabel('Genetic connectivity (Fst)')
-plt.title('Correlation coefficient (R) = -.327, p = 2.7e-6')
+plt.title(f'Correlation coefficient (R) = {r[0]:.3f}, p = {r[1]:.3e}')
 plt.show()
+
+
+
+fst_clean = fst.flatten()
+ost_clean = np.log10(((just14_order+1)/num).flatten())
+dist_clean = ocean_dist.flatten()
+
+fig, axes = plt.subplots(3,3)#, sharex=True, sharey=True)
+axes[0,0].hist(dist_clean)
+axes[0,0].set_ylabel('Ocean Distance (km)')
+axes[0,0].set_xticklabels([])
+axes[0,0].set_yticks([])
+m, b = np.polyfit(dist_clean, ost10_log.flatten(), 1)
+r = stats.pearsonr(dist_clean, ost10_log.flatten())
+axes[0,1].text(0.25,0.5, f'R = {r[0]:.3f}\np = {r[1]:.3e}')
+axes[0,1].axis("off")
+axes[1,0].set_ylabel('Particle tracking\n(log10(% migrants))')
+axes[1,0].set_xticklabels([])
+axes[1,0].scatter(dist_clean, ost10_log.flatten(), color = 'black')
+axes[1,0].plot(dist_clean, m*dist_clean+b, color = 'red')
+m, b = np.polyfit(dist_clean, fst_clean, 1)
+r = stats.pearsonr(dist_clean, fst_clean)
+axes[0,2].text(0.25,0.5, f'R = {r[0]:.3f}\np = {r[1]:.3e}')
+axes[0,2].axis("off")
+axes[2,0].set_ylabel('Fst')
+axes[2,0].set_xlabel('Ocean Distance (km)')
+axes[2,0].scatter(dist_clean, fst_clean, color = 'black')
+axes[2,0].plot(dist_clean, m*dist_clean+b, color = 'red')
+axes[1,1].hist(ost10_log.flatten())
+axes[1,1].set_xticklabels([])
+axes[1,1].set_yticks([])
+m, b = np.polyfit(ost10_log.flatten(), fst_clean, 1)
+r = stats.pearsonr(ost10_log.flatten(), fst_clean)
+axes[1,2].text(0.25,0.5, f'R = {r[0]:.3f}\np = {r[1]:.3e}')
+axes[1,2].axis("off")
+axes[2,1].scatter(ost10_log.flatten(), fst_clean, color = 'black')
+axes[2,1].plot(ost10_log.flatten(), m*ost10_log.flatten()+b, color = 'red')
+axes[2,1].set_yticklabels([])
+axes[2,1].set_xlabel('Particle tracking\n(log10(% migrants))')
+axes[2,2].set_yticklabels([])
+axes[2,2].set_xlabel('Fst')
+axes[2,2].set_yticks([])
+axes[2,2].hist(fst_clean)
+plt.show()
+
+
+
 
 #PDFs for each site
 
