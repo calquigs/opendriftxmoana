@@ -166,14 +166,14 @@ class Grid:
             r = self.records[i]
             lon_idx = self.lon_to_grid_col(min([p[0] for p in b.points[:]]))
             lat_idx = self.lat_to_grid_row(min([p[1] for p in b.points[:]]))
-            self.bin_idx[lon_idx, lat_idx] = r[0]
+            self.bin_idx[lon_idx, lat_idx] = r[4]
         # assign region to each grid cell
-        #self.bin_regions = np.full((self.nlon, self.nlat), -1, dtype='int')
-        #for i in range(len(self.bins)):
-        #    b = self.bins[i]
-        #    lon_idx = self.lon_to_grid_col(min([p[0] for p in b.points[:]]))
-        #    lat_idx = self.lat_to_grid_row(min([p[1] for p in b.points[:]]))
-        #    self.bin_regions[lon_idx, lat_idx] = records[i][6]-1
+        self.bin_regions = np.full((self.nlon, self.nlat), -1, dtype='int')
+        for i in range(len(self.bins)):
+            b = self.bins[i]
+            lon_idx = self.lon_to_grid_col(min([p[0] for p in b.points[:]]))
+            lat_idx = self.lat_to_grid_row(min([p[1] for p in b.points[:]]))
+            self.bin_regions[lon_idx, lat_idx] = records[i][3]
     def lon_to_grid_col(self, lon):
         if lon < 0:
             lon += 360
@@ -268,7 +268,7 @@ def points_to_binmatrix(matrix, sfpoints):
 
 
 
-cells = len(np.where(grid.bin_idx>0)[0])
+cells = len(np.where(grid.bin_idx>=0)[0])
 
 mat0 = np.full((cells, cells+1), fill_value=0)
 
@@ -285,7 +285,7 @@ summer = ['07', '08', '09']
 fall = ['10', '11', '12']
 
 #for month in all:
-for file in glob.glob(f'/nesi/nobackup/vuw03073/bigboy/all_settlement/{sys.argv[1]}*'):
+for file in sorted(glob.glob(f'/nesi/nobackup/vuw03073/bigboy/all_settlement/*')):
 	print(file)
 	sfpoints.append(nc_to_startfinal_points(file))
 

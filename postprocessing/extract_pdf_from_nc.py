@@ -49,21 +49,25 @@ lon_edges = np.linspace(165, 184, 381*2)
 lat_edges = np.linspace(-52, -32, 401*2)
 
 for i in range(len(sites)):
-for file in sorted(glob.glob(f'/nesi/nobackup/vuw03073/bigboy/all_settlement/GOB*')):
+for file in sorted(glob.glob(f'/nesi/nobackup/vuw03073/bigboy/all_settlement/LWR*')):
 	print(file)
 	ym = file[-9:-3]
 	traj = nc.Dataset(file)
+	age = traj.variables['age_seconds'][:]
 	lon = traj.variables['lon'][:]
 	lat = traj.variables['lat'][:]
+	age = age[np.where(age.mask==False)]
 	x = lon[np.where(lon.mask==False)]
+	x = x[age > 3600*24*21]
 	x[x<0] += 360
 	y = lat[np.where(lat.mask==False)]
+	y = y[age > 3600*24*21]
 	H, _, _ = np.histogram2d(y, x, [lat_edges, lon_edges])#, density = True)
 	#pdfs[i] += H
-	outFile = open(f'bigboy_pdf/oneeighty/KAI_GOB/GOB_{ym}_pdf.txt', 'w')
+	outFile = open(f'bigboy_pdf/competent/LWR/LWR_{ym}_pdf.txt', 'w')
 	np.savetxt(outFile, H)
 	outFile.close()
-
+	
 outFile = open(f'FIO_pdf.txt', 'w')
 np.savetxt(outFile, pdf)
 outFile.close()
