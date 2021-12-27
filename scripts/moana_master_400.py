@@ -70,22 +70,18 @@ o.add_reader([reader0, reader1, reader2])
 #Seed Particles
 ###############################
 
+
 shape_filename = "Desktop/opendrift/shapefiles/all_reef_bins/all_reef_bins.shp"
 shp = shapefile.Reader(shape_filename)
 #bins = shp.shapes()
 records = shp.records()
 
 #bins_region = [bins[i] for i in range(len(bins)) if records[i][3] == args.region]
-records_region = [records[i] for i in range(len(bins)) if records[i][3] == args.region]
+records_region = [records[i] for record in records if record[3] == args.region]
 
 
-ullon = args.upperleftlon 
-ullat = args.upperleftlat
-
-#lons = [ullon, ullon+.1, ullon+.1, ullon]
-#lats = [ullat, ullat, ullat-.1, ullat-.1]
-lons = [record[1]+.05 for record in records_region] 
-lats = [record[2]-.05 for record in records_region] 
+lons = [record[0]+.05 for record in records_region] 
+lats = [record[1]-.05 for record in records_region] 
 
 def create_seed_times(start, end, delta):
   """
