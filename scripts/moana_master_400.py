@@ -5,6 +5,7 @@ import sys
 import time
 import numpy as np
 import matplotlib
+import shapefile
 from datetime import datetime, timedelta
 from opendrift.readers import reader_ROMS_native_MOANA
 from opendrift.models.bivalvelarvae2 import BivalveLarvae
@@ -21,7 +22,7 @@ parser.add_argument('-o', '--output', type=str, help='Output file path (ending i
 parser.add_argument('-ym', '--yearmonth', type=int, required=True, help='Month and year to seed (yyyymm)')
 #parser.add_argument('-lon', '--upperleftlon', type=float, required=True, help='Longitude of upper left hand corner of .05 deg bin to seed')
 #parser.add_argument('-lat', '--upperleftlat', type=float, required=True, help='Latitude of upper left hand corner of .05 deg bin to seed')
-parser.add_argument('-r', '--region', type=float, required=True, help='Region to run')
+parser.add_argument('-r', '--region', type=str, required=True, help='Region to run')
 
 args = parser.parse_args()
 
@@ -71,7 +72,7 @@ o.add_reader([reader0, reader1, reader2])
 ###############################
 
 
-shape_filename = "Desktop/opendrift/shapefiles/all_reef_bins/all_reef_bins.shp"
+shape_filename = "/nesi/project/vuw03073/testScripts/all_reef_bins/all_reef_bins.shp"
 shp = shapefile.Reader(shape_filename)
 #bins = shp.shapes()
 records = shp.records()
@@ -102,8 +103,9 @@ times = create_seed_times(reader0.start_time,
 number = 11
 z = np.random.uniform(-10,0,size=len(times)) # generate random depth
 
-for i in range(len(times)):
-  o.seed_elements(lons, lats, number = number, radius=2500, radius_type='uniform',time = times[i], z = z[i])
+for i in range(len(lons)):
+  for j in range(len(times)):
+    o.seed_elements(lons[i], lats[i], number = number, radius=2500, radius_type='uniform',time = times[j], z = z[j])
 
 
 ###########

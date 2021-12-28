@@ -24,7 +24,7 @@ source activate opendrift_simon
 
 #Set variables
 inPath='/nesi/nobackup/mocean02574/NZB_3/'
-outPath='/nesi/nobackup/vuw03073/bigboy22/all_settlement/all_bins/'
+outPath='/nesi/nobackup/vuw03073/bigmomma/'
 
 #14pops
 regions=('taranaki' 'waikato' '90milebeach' 'northland' 'hauraki' 'bay_o_plenty' 'east_cape' 'hawkes_bay' 'wairarapa' 'wellington' 'marlborough' 'kahurangi' 'west_coast' 'fiordland' 'southland' 'stewart_island' 'otago' 'canterbury' 'kaikoura' 'chatham' 'auckland_isl')
@@ -56,6 +56,6 @@ echo $region
 echo ${ym[$(($SLURM_ARRAY_TASK_ID%$num_runs_per_site))]}
 
 #run jobs
-python /nesi/project/vuw03073/opendriftxmoana/scripts/moana_master.py -i $inPath -o $outPath -r $nregion -ym ${ym[$(($SLURM_ARRAY_TASK_ID%$num_runs_per_site))]}
+python /nesi/project/vuw03073/opendriftxmoana/scripts/moana_master_400.py -i $inPath -o $outPath -r $region -ym ${ym[$(($SLURM_ARRAY_TASK_ID%$num_runs_per_site))]}
 
 

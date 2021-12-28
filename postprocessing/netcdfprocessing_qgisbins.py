@@ -82,7 +82,7 @@ for file in glob.glob('OPO/*'):
 ########################################
 #read in settlement bins and create grid
 ########################################
-shape_filename = "rho_settlement_bins/rho_settlement_bins.shp"
+shape_filename = "all_reef_bins/all_reef_bins.shp"
 shp = shapefile.Reader(shape_filename)
 bins = shp.shapes()
 records = shp.records()

@@ -33,7 +33,7 @@ site_labs = site_labs[site_order14]
 
 just14_order2 = just14_order[fst_site_order]
 just14_order2 = just14_order2[:,fst_site_order]
-df = pd.DataFrame(data = just14_order[2:, 2:], index = site_labs[2:], columns = site_labs[2:])
+df = pd.DataFrame(data = just14_order, index = site_labs, columns = site_labs)
 num=np.sum(bigboy14[30])
 df_pct=(df/num)*100
 df_log=np.log10(df_pct)
