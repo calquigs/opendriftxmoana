@@ -9,7 +9,7 @@
 #SBATCH --mail-type=ALL                         #This will send you an email when the STARTS and ENDS		 $
 #SBATCH --mail-user=calquigs@gmail.com          #Enter your email address.                                       $
 #SBATCH --profile=task
-#SBATCH --array=0-791                     # Array jobs
+#SBATCH --array=0-11                     # Array jobs
 #SBATCH --export NONE
 
 export SLURM_EXPORT_ENV=ALL
@@ -24,7 +24,7 @@ source activate opendrift_simon
 
 #Set variables
 inPath='/nesi/nobackup/mocean02574/NZB_3/'
-outPath='/nesi/nobackup/vuw03073/bigboy22/all_settlement/'
+outPath='/nesi/nobackup/vuw03073/bigboy/all_settlement/'
 
 #14pops
 #names=('OPO' 'MAU' 'CAP' 'WEST' 'FLE' 'TAS' 'CAM' 'LWR' 'KAI' 'GOB' 'TIM' 'FIO' 'HSB' 'BGB')
@@ -37,24 +37,24 @@ outPath='/nesi/nobackup/vuw03073/bigboy22/all_settlement/'
 #lats=(-34.6 -35.5 -36.1 -36.7 -37.4 -40.9 -40.7 -40.9 -40.7 -41.1 -41.3 -42.3 -42.9 -43.8 -44.4 -45.1 -46.2 -46.8 -46.9)
 
 #22pops
-names=('HOU' 'OPO' 'PAK' 'TEK' 'MAU' 'CAP' 'KAT' 'POG' 'GOL' 'TAS' 'LWR' 'NMC' 'GOB' 'JAB' 'TIM' 'FIO' 'RIV' 'HSB' 'BGB' 'HIC' 'RUA' 'DAB')
-lons=(173.1 173.2 174.8 175.3 176.0 176.3 173.7 174.2 172.9 173.1 171.9 171.1 173.3 168.6 171.3 166.8 167.6 168.2 168.2 178.3 174.6 174.8)
-lats=(-34.6 -35.5 -36.1 -36.7 -37.4 -40.9 -40.7 -40.9 -40.7 -41.1 -41.3 -42.3 -42.9 -43.8 -44.4 -45.1 -46.3 -46.8 -46.9 -37.4 -38.0 -41.4)
+#names=('HOU' 'OPO' 'PAK' 'TEK' 'MAU' 'CAP' 'KAT' 'POG' 'GOL' 'TAS' 'LWR' 'NMC' 'GOB' 'JAB' 'TIM' 'FIO' 'RIV' 'HSB' 'BGB' 'HIC' 'RUA' 'DAB')
+#lons=(173.1 173.2 174.8 175.3 176.0 176.3 173.7 174.2 172.9 173.1 171.9 171.1 173.3 168.6 171.3 166.8 167.6 168.2 168.2 178.3 174.6 174.8)
+#lats=(-34.6 -35.5 -36.1 -36.7 -37.4 -40.9 -40.7 -40.9 -40.7 -41.1 -41.3 -42.3 -42.9 -43.8 -44.4 -45.1 -46.3 -46.8 -46.9 -37.4 -38.0 -41.4)
 
 #testpops
-#names=('REI' 'LWR' 'DUN')
-#lons=(172.6 171.9 170.8)
-#lats=(-34.3 -41.3 -45.8)
+names=('FIO' 'BGB' 'HSB' 'TIM')
+lons=(166.8 168.2 168.2 171.3)
+lats=(-45.1 -46.9 -46.8 -44.4)
 
 #names=('BGB')
 #lons=(168.2)
 #lats=(-46.9)
 
 #Create array of yyyymm
-months=(01 02 03 04 05 06 07 08 09 10 11 12)
-#months=(08)
+#months=(01 02 03 04 05 06 07 08 09 10 11 12)
+months=(08)
 #years=($(seq 1994 2016))
-years=($(seq 2003 2005))
+years=($(seq 1994 1996))
 #years=(1994)
 declare -a ym
 

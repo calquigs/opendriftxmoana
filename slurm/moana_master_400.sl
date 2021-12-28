@@ -2,14 +2,14 @@
 
 #SBATCH --account=vuw03073                      #Type the project code you want to use for this analyis		 $
 #SBATCH --job-name=all_settlement_test          #This willl be the name appear on the queue			 $
-#SBATCH --mem=3G                               #Amount of memory you need                                       $
-#SBATCH --time=04:00:00                         #Duration dd-hh:mm:ss                                            $
+#SBATCH --mem=5G                               #Amount of memory you need                                       $
+#SBATCH --time=00:10:00                         #Duration dd-hh:mm:ss                                            $
 #SBATCH --cpus-per-task=2                       #Amount of CPUs (logical)                                        $
 #SBATCH --output=/nesi/project/vuw03073/testScripts/slurmOut/all_settlement_test_%a.%j.txt    #Name of the output file                                 $
 #SBATCH --mail-type=ALL                         #This will send you an email when the STARTS and ENDS		 $
 #SBATCH --mail-user=calquigs@gmail.com          #Enter your email address.                                       $
 #SBATCH --profile=task
-#SBATCH --array=0-791                     # Array jobs
+#SBATCH --array=0-1                     # Array jobs
 #SBATCH --export NONE
 
 export SLURM_EXPORT_ENV=ALL
@@ -24,11 +24,11 @@ source activate opendrift_simon
 
 #Set variables
 inPath='/nesi/nobackup/mocean02574/NZB_3/'
-outPath='/nesi/nobackup/vuw03073/bigboy22/all_settlement/all_bins/'
+outPath='/nesi/nobackup/vuw03073/bigmomma/'
 
 #14pops
-regions=('taranaki' 'waikato' '90milebeach' 'northland' 'hauraki' 'bay_o_plenty' 'east_cape' 'hawkes_bay' 'wairarapa' 'wellington' 'marlborough' 'kahurangi' 'west_coast' 'fiordland' 'southland' 'stewart_island' 'otago' 'canterbury' 'kaikoura' 'chatham' 'auckland_isl')
-
+#regions=('taranaki' 'waikato' '90milebeach' 'northland' 'hauraki' 'bay_o_plenty' 'east_cape' 'hawkes_bay' 'wairarapa' 'wellington' 'marlborough' 'kahurangi' 'west_coast' 'fiordland' 'southland' 'stewart_island' 'otago' 'canterbury' 'kaikoura' 'chatham' 'auckland_isl')
+regions=('taranaki')
 
 #Create array of yyyymm
 months=(01 02 03 04 05 06 07 08 09 10 11 12)
@@ -56,6 +56,6 @@ echo $region
 echo ${ym[$(($SLURM_ARRAY_TASK_ID%$num_runs_per_site))]}
 
 #run jobs
-python /nesi/project/vuw03073/opendriftxmoana/scripts/moana_master.py -i $inPath -o $outPath -r $nregion -ym ${ym[$(($SLURM_ARRAY_TASK_ID%$num_runs_per_site))]}
+python /nesi/project/vuw03073/opendriftxmoana/scripts/moana_master_400.py -i $inPath -o $outPath -r $region -ym ${ym[$(($SLURM_ARRAY_TASK_ID%$num_runs_per_site))]}
 
 

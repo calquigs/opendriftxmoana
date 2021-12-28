@@ -8,14 +8,14 @@ import netCDF4 as nc
 from pyproj import Geod
 
 sites = ['OPO','MAU','WEST','FLE','TAS','LWR','CAP','CAM','KAI','GOB','TIM','HSB','BGB','FIO']
-site = sites[sys.argv[1]]
+site = sites[int(sys.argv[1])]
 
 geod = Geod(ellps="WGS84")
 
 for file in sorted(glob.glob(f'/nesi/nobackup/vuw03073/bigboy/all_settlement/{site}*')):
 	traj = nc.Dataset(file)
 	ym = file[-9:-3]
-	print(f'{site}_{ym}')
+	print(f'{site}_{ym}', flush=True)
 	lon = traj.variables['lon'][:]
 	lat = traj.variables['lat'][:]
 	dists = np.zeros((len(lon), 2))

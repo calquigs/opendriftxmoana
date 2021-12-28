@@ -4,6 +4,7 @@ import os
 import sys
 import time
 import numpy as np
+import shapefile
 import matplotlib
 from datetime import datetime, timedelta
 from opendrift.readers import reader_ROMS_native_MOANA
@@ -21,7 +22,7 @@ parser.add_argument('-o', '--output', type=str, help='Output file path (ending i
 parser.add_argument('-ym', '--yearmonth', type=int, required=True, help='Month and year to seed (yyyymm)')
 #parser.add_argument('-lon', '--upperleftlon', type=float, required=True, help='Longitude of upper left hand corner of .05 deg bin to seed')
 #parser.add_argument('-lat', '--upperleftlat', type=float, required=True, help='Latitude of upper left hand corner of .05 deg bin to seed')
-parser.add_argument('-r', '--region', type=float, required=True, help='Region to run')
+parser.add_argument('-r', '--region', type=str, required=True, help='Region to run')
 
 args = parser.parse_args()
 
@@ -71,7 +72,7 @@ o.add_reader([reader0, reader1, reader2])
 ###############################
 
 
-shape_filename = "Desktop/opendrift/shapefiles/all_reef_bins/all_reef_bins.shp"
+shape_filename = "/nesi/project/vuw03073/testScripts/all_reef_bins/all_reef_bins.shp"
 shp = shapefile.Reader(shape_filename)
 #bins = shp.shapes()
 records = shp.records()
