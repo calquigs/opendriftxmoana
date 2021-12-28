@@ -17,7 +17,7 @@ import argparse
 parser = argparse.ArgumentParser(description='Run opendrift simulation')
 parser.add_argument('-i', '--input', type=str, required=True, help='Input reaader file path (ending in /)')
 parser.add_argument('-o', '--output', type=str, help='Output file path (ending in /')
-parser.add_argument('-n', '--name', type=str, default='opendrift', help='Output file name')
+#parser.add_argument('-n', '--name', type=str, default='opendrift', help='Output file name')
 parser.add_argument('-ym', '--yearmonth', type=int, required=True, help='Month and year to seed (yyyymm)')
 #parser.add_argument('-lon', '--upperleftlon', type=float, required=True, help='Longitude of upper left hand corner of .05 deg bin to seed')
 #parser.add_argument('-lat', '--upperleftlat', type=float, required=True, help='Latitude of upper left hand corner of .05 deg bin to seed')
@@ -152,23 +152,24 @@ o.run(stop_on_error=False,
       end_time=reader2.end_time,
       time_step=3600, 
       time_step_output = 3600.0*12,
-      export_variables = [])
+      export_variables = ['trajectory', 'time', 'age_seconds', 'lon', 'lat', 'z'],
+      outfile = f'{args.output}{args.region}_{yyyy0}{mm0}.nc')
 
-index_of_first, index_of_last = o.index_of_activation_and_deactivation()
-lons = o.get_property('lon')[0]
-lats = o.get_property('lat')[0]
-status = o.get_property('status')[0]
-lons_end = lons[index_of_last, range(lons.shape[1])]
-lats_end = lats[index_of_last, range(lons.shape[1])]
-status_end = status[index_of_last, range(lons.shape[1])]
-print(o.status_categories)
+# index_of_first, index_of_last = o.index_of_activation_and_deactivation()
+# lons = o.get_property('lon')[0]
+# lats = o.get_property('lat')[0]
+# status = o.get_property('status')[0]
+# lons_end = lons[index_of_last, range(lons.shape[1])]
+# lats_end = lats[index_of_last, range(lons.shape[1])]
+# status_end = status[index_of_last, range(lons.shape[1])]
+# print(o.status_categories)
 
-outFile = open(f'{args.output}{args.name}_{yyyy0}{mm0}.txt','w')
+# outFile = open(f'{args.output}{args.region}_{yyyy0}{mm0}.txt','w')
 
-for i in range(len(lons_end)):
-  outFile.write(str(lons_start[i])+","+str(lats_start[i])+","+str(lons_end[i])+","+str(lats_end[i])+","+str(o.status_categories[status_end[i]])+"\n")
+# for i in range(len(lons_end)):
+#   outFile.write(str(lons_start[i])+","+str(lats_start[i])+","+str(lons_end[i])+","+str(lats_end[i])+","+str(o.status_categories[status_end[i]])+"\n")
 
-outFile.close()
+# outFile.close()
 
 #o.plot(filename=f'{args.name}_{yyyy0}{mm0}.jpg')
 
