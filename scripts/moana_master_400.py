@@ -6,6 +6,7 @@ import time
 import numpy as np
 import shapefile
 import matplotlib
+import shapefile
 from datetime import datetime, timedelta
 from opendrift.readers import reader_ROMS_native_MOANA
 from opendrift.models.bivalvelarvae2 import BivalveLarvae
@@ -103,8 +104,9 @@ times = create_seed_times(reader0.start_time,
 number = 11
 z = np.random.uniform(-10,0,size=len(times)) # generate random depth
 
-for i in range(len(times)):
-  o.seed_elements(lons, lats, number = number, radius=2500, radius_type='uniform',time = times[i], z = z[i])
+for i in range(len(lons)):
+  for j in range(len(times)):
+    o.seed_elements(lons[i], lats[i], number = number, radius=2500, radius_type='uniform',time = times[j], z = z[j])
 
 
 ###########
