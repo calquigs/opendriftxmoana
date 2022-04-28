@@ -26,7 +26,7 @@ source activate opendrift_simon
 inPath='/nesi/nobackup/mocean02574/NZB_31/'
 outPath='/nesi/nobackup/vuw03073/bigmomma/'
 
-#14pops
+#define regions
 regions=('taranaki' 'waikato' '90milebeach' 'northland' 'hauraki' 'bay_o_plenty' 'east_cape' 'hawkes_bay' 'wairarapa' 'wellington' 'marlborough' 'kahurangi' 'west_coast' 'fiordland' 'southland' 'stewart_isl' 'otago' 'canterbury' 'kaikoura' 'chatham' 'auckland_isl')
 
 #Create array of yyyymm
