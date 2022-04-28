@@ -9,7 +9,7 @@
 #SBATCH --mail-type=ALL                         #This will send you an email when the STARTS and ENDS		 $
 #SBATCH --mail-user=calquigs@gmail.com          #Enter your email address.                                       $
 #SBATCH --profile=task
-#SBATCH --array=0-755                     # Array jobs
+#SBATCH --array=0-755                     # Array jobs. Should be equal to the # of regions * # of months * # of years
 #SBATCH --export NONE
 
 export SLURM_EXPORT_ENV=ALL
