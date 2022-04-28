@@ -22,20 +22,19 @@ module purge
 module load Miniconda3
 source activate opendrift_simon
 
-#Set variables
+#Set path variables
 inPath='/nesi/nobackup/mocean02574/NZB_31/'
 outPath='/nesi/nobackup/vuw03073/bigmomma/'
 
 #14pops
 regions=('taranaki' 'waikato' '90milebeach' 'northland' 'hauraki' 'bay_o_plenty' 'east_cape' 'hawkes_bay' 'wairarapa' 'wellington' 'marlborough' 'kahurangi' 'west_coast' 'fiordland' 'southland' 'stewart_isl' 'otago' 'canterbury' 'kaikoura' 'chatham' 'auckland_isl')
-#regions=('wellington' 'waikato')
 
 #Create array of yyyymm
 months=(01 02 03 04 05 06 07 08 09 10 11 12)
 #months=(01)
 #years=($(seq 1994 2016))
-#years=($(seq 1994 1996))
 years=($(seq 1995 1997))
+
 declare -a ym
 
 for i in "${months[@]}"
