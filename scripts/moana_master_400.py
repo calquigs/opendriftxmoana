@@ -9,7 +9,7 @@ import matplotlib
 import shapefile
 from datetime import datetime, timedelta
 from opendrift.readers import reader_ROMS_native_MOANA
-from opendrift.models.bivalvelarvae2 import BivalveLarvae
+from opendrift.models.bivalvelarvae import BivalveLarvae
 
 ###############################
 #Parse arguments
@@ -65,7 +65,7 @@ reader2.multiprocessing_fail = True
 #Create Simulation Object
 ###############################
 
-o = BivalveLarvae(loglevel=30)
+o = BivalveLarvae(loglevel=0)
 o.add_reader([reader0, reader1, reader2])
 
 ###############################
@@ -78,13 +78,12 @@ shp = shapefile.Reader(shape_filename)
 #bins = shp.shapes()
 records = shp.records()
 
-#bins_region = [bins[i] for i in range(len(bins)) if records[i][3] == args.region]
-records_region = [records[i] for record in records if record[3] == args.region]
-
+records_region = [record for record in records if record[2] == args.region]
 
 lons = [record[0]+.05 for record in records_region] 
 lats = [record[1]-.05 for record in records_region] 
-
+print(lons)
+print(lats)
 def create_seed_times(start, end, delta):
   """
   crate times at given interval to seed particles
@@ -101,19 +100,28 @@ times = create_seed_times(reader0.start_time,
                           reader0.end_time, timedelta(hours = 1))
 
 
-number = 11
+number = 5
 z = np.random.uniform(-10,0,size=len(times)) # generate random depth
 
 for i in range(len(lons)):
   for j in range(len(times)):
-    o.seed_elements(lons[i], lats[i], number = number, radius=2500, radius_type='uniform',time = times[j], z = z[j])
+    o.seed_elements(lons[i], lats[i], number=number, radius=2500, radius_type='uniform',time = times[j], z = z[j])
+
+lons_start = o.elements_scheduled.lon
+lats_start = o.elements_scheduled.lat
+
+print(lons_start)
+print(lats_start)
+
+o.plot(corners=[174,176,-42,-41], filename='/nesi/project/vuw03073/testScripts/bigmomma_before.jpg')
+
 
 
 ###########
 #Load habitat
 ###########
-shp, bins = o.habitat('./all_reef_bins/all_reef_bins.shp') # Location of the shapefile with the habit$
-
+#shp, bins = o.habitat('/nesi/project/vuw03073/testScripts/all_reef_bins/all_reef_bins.shp') # Location of the shapefile with the habit$
+o.add_settlement_habitat('/nesi/project/vuw03073/testScripts/all_reef_bins/all_reef_bins.shp')
 
 ###############################
 #Set Configs
@@ -123,7 +131,7 @@ o.set_config('environment:fallback:x_wind', 0.0)
 o.set_config('environment:fallback:y_wind', 0.0)
 o.set_config('environment:fallback:x_sea_water_velocity', 0.0)
 o.set_config('environment:fallback:y_sea_water_velocity', 0.0)
-o.set_config('environment:fallback:sea_floor_depth_below_sea_level', 100000.0)
+o.set_config('environment:fallback:sea_floor_depth_below_sea_level', 12000.0)
 
 Kxy = 0.1176  #m2/s-1
 Kz = 0.01 #m2/s-1
@@ -134,11 +142,11 @@ o.set_config('seed:ocean_only',True)
 o.set_config('drift:advection_scheme','runge-kutta4')
 o.set_config('drift:current_uncertainty', 0.0)
 o.set_config('drift:max_age_seconds', 3600*24*35)
-o.set_config('drift:min_settlement_age_seconds', 3600*24*21)
+o.set_config('biology:min_settlement_age_seconds', 3600*24*21)
 o.set_config('general:seafloor_action', 'lift_to_seafloor')
 o.set_config('drift:vertical_mixing', False)
 o.set_config('general:coastline_action','previous')
-o.set_config('drift:settlement_in_habitat', True)
+o.set_config('biology:settlement_in_habitat', True)
 
 o.list_config()
 
@@ -148,6 +156,11 @@ o.list_config()
 
 lons_start = o.elements_scheduled.lon
 lats_start = o.elements_scheduled.lat
+seed_pts = np.array((lons_start,lats_start))
+
+outFile = open(f'/nesi/nobackup/vuw03073/bigmomma_seeds/{args.region}_{yyyy0}{mm0}_seeds.txt', 'w')
+np.savetxt(outFile,seed_pts)
+outFile.close()
 
 #o.plot()
 
@@ -157,6 +170,9 @@ o.run(stop_on_error=False,
       time_step_output = 3600.0*12,
       export_variables = ['trajectory', 'time', 'age_seconds', 'lon', 'lat', 'z'],
       outfile = f'{args.output}{args.region}_{yyyy0}{mm0}.nc')
+
+o.plot(corners=[174,176,-42,-41], filename='/nesi/project/vuw03073/testScripts/bigmomma_after2.jpg')
+
 
 # index_of_first, index_of_last = o.index_of_activation_and_deactivation()
 # lons = o.get_property('lon')[0]
