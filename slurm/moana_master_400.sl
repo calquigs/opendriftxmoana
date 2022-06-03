@@ -9,7 +9,7 @@
 #SBATCH --mail-type=ALL                         #This will send you an email when the STARTS and ENDS		 $
 #SBATCH --mail-user=calquigs@gmail.com          #Enter your email address.                                       $
 #SBATCH --profile=task
-#SBATCH --array=0-755                     # Array jobs
+#SBATCH --array=0-251                     # Array jobs
 #SBATCH --export NONE
 
 export SLURM_EXPORT_ENV=ALL
@@ -33,8 +33,8 @@ regions=('taranaki' 'waikato' '90milebeach' 'northland' 'hauraki' 'bay_o_plenty'
 months=(01 02 03 04 05 06 07 08 09 10 11 12)
 #months=(01)
 #years=($(seq 1994 2016))
-years=($(seq 1995 1997))
-
+#years=($(seq 1995 1997))
+years=(1994)
 declare -a ym
 
 for i in "${months[@]}"
