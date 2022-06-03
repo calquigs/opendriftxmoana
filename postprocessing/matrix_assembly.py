@@ -7,16 +7,12 @@ import netCDF4 as nc
 import matplotlib.pyplot as plt
 import math
 #from mpl_toolkits.basemap import Basemap
-from timeit import default_timer as timer
 import shapely
 from shapely.geometry import Point, Polygon
 from shapely.geometry import shape
 import shapefile
-import seaborn as sns
 import pandas as pd
-from mpl_toolkits.basemap import Basemap
 import glob
-from scipy.signal import convolve2d
 
 def nc_to_startfinal_points(nc_in,seed):
     '''
